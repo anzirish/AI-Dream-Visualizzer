@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import LoginForm from '@/components/auth/LoginForm';
-import { Sparkles, Zap, Shield, Rocket } from 'lucide-react';
+import { Sparkles, Zap, Shield } from 'lucide-react';
 
 const Login: React.FC = () => {
   const { user } = useAuth();
@@ -60,32 +60,6 @@ const Login: React.FC = () => {
                 <p className="text-sm text-gray-700">Your dreams are safely stored and protected</p>
               </div>
             </div>
-
-            <div className="group flex items-start gap-4 p-5 bg-white backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-pink-300">
-              <div className="p-3 bg-pink-100 rounded-xl group-hover:bg-pink-200 transition-colors">
-                <Rocket className="w-6 h-6 text-pink-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1">Unlimited Creation</h3>
-                <p className="text-sm text-gray-700">Create and save unlimited dream stories</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Testimonial */}
-          <div className="p-6 bg-gradient-to-br from-white to-blue-50 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-lg">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
-              <div>
-                <p className="text-gray-800 italic mb-3">
-                  "This app has transformed how I capture and remember my dreams. The AI-generated stories are absolutely magical!"
-                </p>
-                <div className="text-sm font-semibold text-gray-900">Alex Thompson</div>
-                <div className="text-xs text-gray-600">Dream Enthusiast</div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -113,35 +87,6 @@ const Login: React.FC = () => {
           {/* Login Card */}
           <div className="bg-white backdrop-blur-sm py-8 px-6 shadow-2xl rounded-2xl border-2 border-gray-200">
             <LoginForm />
-          </div>
-
-          {/* Additional info */}
-          <div className="text-center text-sm text-gray-700 px-4">
-            <p>
-              Don't have an account?{' '}
-              <button 
-                onClick={() => navigate('/signup')}
-                className="text-blue-600 hover:text-blue-700 font-semibold underline"
-              >
-                Sign up for free
-              </button>
-            </p>
-          </div>
-
-          {/* Trust indicators */}
-          <div className="flex items-center justify-center gap-6 pt-4">
-            <div className="flex items-center gap-2 text-xs text-gray-600">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              Secure Login
-            </div>
-            <div className="flex items-center gap-2 text-xs text-gray-600">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-              Encrypted
-            </div>
-            <div className="flex items-center gap-2 text-xs text-gray-600">
-              <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
-              Privacy First
-            </div>
           </div>
         </div>
       </div>

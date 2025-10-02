@@ -201,7 +201,7 @@ const DreamForm: React.FC<DreamFormProps> = ({ onStoryGenerated }) => {
           <div className="flex items-center justify-between text-xs text-gray-500 pt-2">
             <span className="flex items-center gap-1">
               <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-              Free generations available
+              Free generations may be unavailable
             </span>
             <span>Powered by AI</span>
           </div>

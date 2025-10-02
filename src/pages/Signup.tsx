@@ -72,28 +72,6 @@ const Signup: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 pt-6">
-            <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200">
-              <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                1000+
-              </div>
-              <div className="text-xs text-gray-600 mt-1">Dreams Created</div>
-            </div>
-            <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200">
-              <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                500+
-              </div>
-              <div className="text-xs text-gray-600 mt-1">Active Dreamers</div>
-            </div>
-            <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200">
-              <div className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-blue-600 bg-clip-text text-transparent">
-                100%
-              </div>
-              <div className="text-xs text-gray-600 mt-1">Free to Use</div>
-            </div>
-          </div>
         </div>
 
         {/* Right side - Signup form */}
@@ -144,21 +122,6 @@ const Signup: React.FC = () => {
             </p>
           </div>
 
-          {/* Trust indicators */}
-          <div className="flex items-center justify-center gap-6 pt-4">
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              Secure
-            </div>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-              Fast Setup
-            </div>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
-              Free Forever
-            </div>
-          </div>
         </div>
       </div>
     </div>
