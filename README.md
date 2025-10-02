@@ -1,73 +1,109 @@
-# React + TypeScript + Vite
+# AI Dream Visualizer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Introduction
 
-Currently, two official plugins are available:
+AI Dream Visualizer is a full-stack web application that transforms users' dreams into meaningful experiences through AI-powered analysis, storytelling, and visual generation. The platform allows users to record their dreams, receive intelligent interpretations, generate accompanying narratives, and create stunning AI-generated images that bring their dreams to life. With built-in social features, users can share their dreams with the community and explore others' nocturnal adventures in a secure, authenticated environment.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Project Type
 
-## React Compiler
+Full-Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Deployed App
 
-## Expanding the ESLint configuration
+Frontend: https://ai-dream-visualizzer.vercel.app/
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Backend: Firebase (Serverless)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Database: Firestore (Cloud Database)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Directory Structure
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+ai-dream-visualizer/
+├─ public/
+├─ src/
+│  ├─ components/
+│  │  ├─ Auth/
+│  │  ├─ Dream/
+│  │  ├─ Layout/
+│  │  ├─ UI/
+│  │  └─ ...
+│  ├─ services/
+│  │  ├─ firebase.js
+│  │  ├─ openRouterAPI.js
+│  │  └─ stableDiffusionAPI.js
+│  ├─ context/
+│  │  └─ AuthContext.js
+│  ├─ pages/
+│  │  ├─ Home.js
+│  │  ├─ Dashboard.js
+│  │  └─ Community.js
+│  ├─ App.js
+│  └─ index.js
+├─ .env
+├─ package.json
+└─ README.md
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- User authentication with email/password using Firebase Auth
+- Dream recording and storage in the Firestore database
+- AI-powered dream analysis using OpenRouter.ai API
+- Automatic story generation based on dream descriptions
+- AI image generation using Stable Diffusion
+- Personal dream journal with all saved dreams
+- Public/private dream visibility toggle
+- Community feed to explore other users' public dreams
+- Responsive design for mobile and desktop
+- Real-time data synchronization with Firestore
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Design Decisions or Assumptions
+
+- Selected Firebase for serverless architecture, eliminating the need for custom backend development while providing robust authentication and real-time database capabilities
+- Used OpenRouter.ai for flexible access to multiple LLM models and Stable Diffusion for high-quality image generation
+- Dreams are stored with user references, allowing efficient querying of both personal dreams and public community content
+- Implemented a simple boolean flag for public/private dream visibility
+- Leveraged Firebase's client SDK to directly communicate with cloud services, reducing infrastructure complexity
+- Built as a single-page application for a smooth user experience
+
+## Installation & Getting started
+
+```bash
+git clone https://github.com/anzirish/ai-dream-visualizer.git
+cd ai-dream-visualizer
+npm install
+npm start
 ```
+
+## Usage
+
+```bash
+npm start
+```
+
+![Personal Finance Dashboard Screenshot](https://github.com/anzirish/Masai/blob/main/Screenshot%20(115).png)
+
+## Credentials
+
+```
+Email: demo@dreamvisualizer.com
+Password: Demo@123
+```
+
+## APIs Used
+
+- OpenRouter.ai API - AI text generation for dream analysis and storytelling
+- Stable Diffusion API - AI image generation based on dream descriptions
+- Firebase Authentication API - User management and authentication
+- Firestore API - Real-time NoSQL database
+
+## Technology Stack
+
+- React
+- Firebase Authentication
+- Firestore
+- OpenRouter.ai API
+- Stable Diffusion
+- Tailwind CSS
+- React Router
