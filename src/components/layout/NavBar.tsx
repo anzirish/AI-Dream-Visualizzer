@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { Menu, X, LogOut, Home, PlusCircle, Moon } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -19,78 +21,176 @@ const Navbar: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
+    <nav className="bg-white/80 backdrop-blur-md shadow-lg border-b border-gray-200/50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 p-2.5 rounded-xl transform group-hover:scale-105 transition-transform duration-200">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
             </div>
-            <span className="text-xl font-bold text-gray-900">DreamForge</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              AI Dream Visualizer
+            </span>
           </Link>
 
-          {/* Navigation Links (for authenticated users) */}
+          {/* Navigation Links (Desktop) */}
           {user && (
-            <div className="hidden md:flex items-center space-x-6">
+            <div className="hidden md:flex items-center space-x-2">
               <Link 
                 to="/" 
-                className={`font-medium transition-colors ${
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive('/') 
-                    ? 'text-blue-600' 
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-blue-50 text-blue-600 shadow-sm' 
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
-                Home
+                <Home className="w-4 h-4" />
+                <span>Home</span>
               </Link>
               <Link 
                 to="/create-dream" 
-                className={`font-medium transition-colors ${
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive('/create-dream') 
-                    ? 'text-blue-600' 
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-blue-50 text-blue-600 shadow-sm' 
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
-                Create Dream
+                <PlusCircle className="w-4 h-4" />
+                <span>Create Dream</span>
               </Link>
               <Link 
                 to="/my-dreams" 
-                className={`font-medium transition-colors ${
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive('/my-dreams') 
-                    ? 'text-blue-600' 
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-blue-50 text-blue-600 shadow-sm' 
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
-                My Dreams
+                <Moon className="w-4 h-4" />
+                <span>My Dreams</span>
               </Link>
             </div>
           )}
 
-          {/* Right side items */}
-          <div className="flex items-center space-x-4">
+          {/* Right side items (Desktop) */}
+          <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">
-                  Welcome, <span className="font-medium text-gray-900">{user.name}</span>
-                </span>
+                <div className="flex items-center space-x-3 px-4 py-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">
+                    {user.name}
+                  </span>
+                </div>
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow"
                 >
-                  Logout
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
                 </button>
               </div>
             ) : (
               <div className="flex items-center space-x-3">
                 <Link to="/login">
-                  <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                  <button className="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow">
                     Login
                   </button>
                 </Link>
                 <Link to="/signup">
-                  <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors">
+                  <button className="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    Sign Up
+                  </button>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-gray-200 bg-white/95 backdrop-blur-md">
+          <div className="px-4 py-4 space-y-3">
+            {user ? (
+              <>
+                <div className="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">
+                    {user.name}
+                  </span>
+                </div>
+                <Link 
+                  to="/" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all ${
+                    isActive('/') 
+                      ? 'bg-blue-50 text-blue-600' 
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <Home className="w-5 h-5" />
+                  <span>Home</span>
+                </Link>
+                <Link 
+                  to="/create-dream" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all ${
+                    isActive('/create-dream') 
+                      ? 'bg-blue-50 text-blue-600' 
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <PlusCircle className="w-5 h-5" />
+                  <span>Create Dream</span>
+                </Link>
+                <Link 
+                  to="/my-dreams" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all ${
+                    isActive('/my-dreams') 
+                      ? 'bg-blue-50 text-blue-600' 
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <Moon className="w-5 h-5" />
+                  <span>My Dreams</span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all font-medium"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span>Logout</span>
+                </button>
+              </>
+            ) : (
+              <div className="space-y-3">
+                <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block">
+                  <button className="w-full px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all">
+                    Login
+                  </button>
+                </Link>
+                <Link to="/signup" onClick={() => setMobileMenuOpen(false)} className="block">
+                  <button className="w-full px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg transition-all shadow-md">
                     Sign Up
                   </button>
                 </Link>
@@ -98,7 +198,7 @@ const Navbar: React.FC = () => {
             )}
           </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 };

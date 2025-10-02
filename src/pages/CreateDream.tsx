@@ -1,21 +1,22 @@
-import DreamForm from "@/components/dream/DreamForm.tsx";
-import StoryDisplay from "@/components/dream/StoryDisplay.tsx";
-import type { DreamFormData } from "@/types/dream.ts";
-import { useState } from "react";
+import React, { useState } from 'react';
+import DreamForm from '../components/dream/DreamForm';
+import StoryDisplay from '../components/dream/StoryDisplay';
+import type { DreamFormData } from '../types/dream';
 
 const CreateDream: React.FC = () => {
   const [generatedStory, setGeneratedStory] = useState<string | null>(null);
+  const [generatedImage, setGeneratedImage] = useState<string>('');
   const [dreamData, setDreamData] = useState<DreamFormData | null>(null);
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
 
-  const handleStoryGenerated = (story: string, formData: DreamFormData, image : string) => {
+  const handleStoryGenerated = (story: string, formData: DreamFormData, image: string) => {
     setGeneratedStory(story);
+    setGeneratedImage(image);
     setDreamData(formData);
-    setGeneratedImage(image)
   };
 
   const handleReset = () => {
     setGeneratedStory(null);
+    setGeneratedImage('');
     setDreamData(null);
   };
 
@@ -36,7 +37,7 @@ const CreateDream: React.FC = () => {
         </div>
 
         <div className="space-y-8">
-          {!generatedStory || !generatedImage ? (
+          {!generatedStory ? (
             <DreamForm onStoryGenerated={handleStoryGenerated} />
           ) : (
             dreamData && (
@@ -60,11 +61,11 @@ const CreateDream: React.FC = () => {
             </div>
             <div className="flex items-start space-x-2">
               <span className="font-bold text-blue-600">2.</span>
-              <span>AI transforms it into a creative story</span>
+              <span>AI transforms it into a creative story with image</span>
             </div>
             <div className="flex items-start space-x-2">
               <span className="font-bold text-blue-600">3.</span>
-              <span>Save your story or create another dream</span>
+              <span>Choose to make it public or private, then save</span>
             </div>
           </div>
         </div>
