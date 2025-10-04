@@ -10,7 +10,7 @@ Full-Stack
 
 ## Deployed App
 
-Frontend: https://your-deployed-frontend.vercel.app
+Frontend: https://ai-dream-visualizzer.vercel.app/
 
 Backend: Firebase (Serverless)
 
@@ -24,9 +24,9 @@ ai-dream-visualizer/
 ├─ src/
 │  ├─ components/
 │  │  ├─ Auth/
-│  │  ├─ DreamForm/
-│  │  ├─ DreamCard/
-│  │  ├─ CommunityFeed/
+│  │  ├─ Dream/
+│  │  ├─ Layout/
+│  │  ├─ UI/
 │  │  └─ ...
 │  ├─ services/
 │  │  ├─ firebase.js
@@ -44,14 +44,6 @@ ai-dream-visualizer/
 ├─ package.json
 └─ README.md
 ```
-
-## Video Walkthrough of the project
-
-Attach a very short video walkthrough of all of the features [ 1 - 3 minutes ]
-
-## Video Walkthrough of the codebase
-
-Attach a very short video walkthrough of codebase [ 1 - 5 minutes ]
 
 ## Features
 
@@ -78,7 +70,7 @@ Attach a very short video walkthrough of codebase [ 1 - 5 minutes ]
 ## Installation & Getting started
 
 ```bash
-git clone https://github.com/yourusername/ai-dream-visualizer.git
+git clone https://github.com/anzirish/ai-dream-visualizer.git
 cd ai-dream-visualizer
 npm install
 npm start
@@ -90,7 +82,7 @@ npm start
 npm start
 ```
 
-Include screenshots as necessary.
+![Personal Finance Dashboard Screenshot](https://github.com/anzirish/Masai/blob/main/Screenshot%20(115).png)
 
 ## Credentials
 
