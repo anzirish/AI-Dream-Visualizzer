@@ -82,7 +82,7 @@ npm start
 npm start
 ```
 
-![Personal Finance Dashboard Screenshot](https://github.com/anzirish/Masai/blob/main/Screenshot%20(115).png)
+![Personal Finance Dashboard Screenshot](https://github.com/anzirish/Masai/blob/main/Screenshot%20(117).png)
 
 ## Credentials
 
