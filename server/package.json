@@ -1,23 +1,29 @@
 {
-  "name": "dreamjournal-server",
+  "name": "aidreams-server",
   "version": "1.0.0",
-  "description": "Dream Journal API Server",
+  "description": "AI Dreams API Server",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "jest"
+    "postbuild": "cp package.json dist/",
+    "test": "jest",
+    "render-build": "npm install && npm run build"
   },
   "keywords": [
-    "dream",
-    "journal",
+    "ai",
+    "dreams",
     "api",
     "express",
     "mongodb"
   ],
   "author": "Vipin Dev",
   "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
