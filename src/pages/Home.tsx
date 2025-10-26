@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import PublicDreamFeed from '../components/dream/PublicDreamFeed';
-import { useAuth } from '@/hooks/useAuth.ts';
+import { PublicDreamFeed } from '@/features/dreams';
+import { useAuth } from '@/features/auth';
 
 const Home: React.FC = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Hero Section */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
             Welcome to the{' '}
-            <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
-              World of Dremas
+            <span className="text-blue-600">
+              World of Dreams
             </span>
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
@@ -23,10 +23,17 @@ const Home: React.FC = () => {
           </p>
 
           {/* CTA Buttons */}
-          {user && (
+          {loading ? (
+            <div className="flex justify-center mb-8">
+              <div className="flex items-center space-x-3 px-6 py-3 bg-white rounded-lg shadow-lg border border-gray-200">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                <span className="text-gray-600 font-medium">Loading...</span>
+              </div>
+            </div>
+          ) : user ? (
             <div className="flex justify-center gap-4 mb-8">
               <Link to="/create-dream">
-                <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg transition-all transform hover:scale-105">
+                <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all transform hover:scale-105">
                   Create Dream ✨
                 </button>
               </Link>
@@ -36,9 +43,7 @@ const Home: React.FC = () => {
                 </button>
               </Link>
             </div>
-          )}
-
-          {!user && (
+          ) : (
             <div className="flex justify-center gap-4 mb-8">
               <Link to="/login">
                 <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all">

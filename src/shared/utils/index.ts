@@ -1,0 +1,1 @@
+export { validateEmail, validatePassword, validateName, validateConfirmPassword } from './validation';
