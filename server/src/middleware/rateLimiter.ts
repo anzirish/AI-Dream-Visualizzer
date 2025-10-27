@@ -1,37 +1,37 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit from "express-rate-limit";
 
 /**
- * Rate limiting middleware to prevent abuse
- * Limits requests per IP address within a time window
+ * Rate Limiting Configuration
+ *
+ * Configures express-rate-limit middleware to limit the number of requests
+ * per IP address within a specified time window. Helps prevent abuse and
+ * ensures fair resource allocation among users.
+ *
+ * Current limits:
+ * - 100 requests per 15-minute window per IP address
+ * - Standardized error response format
+ *
+ * @constant {RateLimitRequestHandler} rateLimiter
+ *
  */
 export const rateLimiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes default
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'), // 100 requests per window
-  message: {
-    success: false,
-    message: 'Too many requests from this IP, please try again later.',
-  },
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  // Skip successful requests (only count errors and failed attempts)
-  skipSuccessfulRequests: false,
-  // Skip failed requests (only count successful requests)
-  skipFailedRequests: false,
-});
+  /** Time window in milliseconds (15 minutes) */
+  windowMs: 15 * 60 * 1000,
 
-/**
- * Stricter rate limiting for authentication endpoints
- * Prevents brute force attacks on login/signup
- */
-export const authRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 3, // 3 attempts per window
+  /** Maximum number of requests per window per IP */
+  max: 100,
+
+  /** Standardized error response when limit is exceeded */
   message: {
     success: false,
-    message: 'Too many authentication attempts, please try again in 15 minutes.',
+    message: "Too many requests, please try again later.",
   },
-  standardHeaders: true,
-  legacyHeaders: false,
-  // Only count failed authentication attempts
-  skipSuccessfulRequests: true,
+
+  /**
+   * Additional configuration options:
+   * - standardHeaders: true (adds RateLimit-* headers)
+   * - legacyHeaders: false (disables X-RateLimit-* headers)
+   * - skip: function to skip rate limiting for certain requests
+   * - keyGenerator: function to customize how IPs are identified
+   */
 });
