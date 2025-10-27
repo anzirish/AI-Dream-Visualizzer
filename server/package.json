@@ -7,7 +7,6 @@
     "dev": "nodemon index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "postbuild": "cp package.json dist/",
     "test": "jest",
     "render-build": "npm install && npm run build"
   },
