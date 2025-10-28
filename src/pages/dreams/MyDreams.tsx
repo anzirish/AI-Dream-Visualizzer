@@ -1,44 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import { collection, query, where, orderBy, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '@/services/firebase/firebase';
 import type { Dream } from '@/features/dreams';
 import { Link } from 'react-router-dom';
 import { DreamCard } from '@/features/dreams';
 import { useAuth } from '@/features/auth';
+import { dreamService } from '@/features/dreams/services/dreamService';
 
+/**
+ * MyDreams Page Component
+ *
+ * Personal dashboard page displaying all dreams created by the authenticated user.
+ * Provides management capabilities for user's dream collection.
+ *
+ * Features:
+ * - Grid layout of user's dreams using DreamCard components
+ * - Delete functionality for dream management
+ * - Empty state with call-to-action for new users
+ * - Loading states during data fetching
+ * - Error handling for API operations
+ * - Responsive grid layout for different screen sizes
+ * - Integration with dream service for CRUD operations
+ */
 const MyDreams: React.FC = () => {
+  // Authentication and state management
   const { user } = useAuth();
+  
+  /** Array of user's dreams */
   const [dreams, setDreams] = useState<Dream[]>([]);
+  
+  /** Loading state during initial data fetch */
   const [loading, setLoading] = useState(true);
 
+  /**
+   * Fetches user's dreams from the backend
+   * Only executes if user is authenticated
+   */
   const fetchDreams = async () => {
     if (!user) return;
 
     try {
-      const q = query(
-        collection(db, 'dreams'),
-        where('userId', '==', user.uid),
-        orderBy('createdAt', 'desc')
-      );
-      
-      const querySnapshot = await getDocs(q);
-      const dreamsData: Dream[] = [];
-      
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        dreamsData.push({
-          id: doc.id,
-          userId: data.userId,
-          userName: data.userName || user.name,
-          title: data.title,
-          description: data.description,
-          generatedStory: data.generatedStory,
-          generatedImage: data.generatedImage || '',
-          isPublic: data.isPublic !== undefined ? data.isPublic : false, // Handle old dreams
-          createdAt: data.createdAt.toDate(),
-        });
-      });
-      
+      // Fetch dreams via dream service
+      const dreamsData = await dreamService.getMyDreams();
       setDreams(dreamsData);
     } catch (error) {
       console.error('Error fetching dreams:', error);
@@ -47,13 +48,22 @@ const MyDreams: React.FC = () => {
     }
   };
 
+  // Fetch dreams when component mounts or user changes
   useEffect(() => {
     fetchDreams();
   }, [user]);
 
+  /**
+   * Handles dream deletion with optimistic UI updates
+   * 
+   * @param dreamId - ID of the dream to delete
+   */
   const handleDelete = async (dreamId: string) => {
     try {
-      await deleteDoc(doc(db, 'dreams', dreamId));
+      // Delete dream via service
+      await dreamService.deleteDream(dreamId);
+      
+      // Optimistically update UI by removing dream from state
       setDreams(dreams.filter(dream => dream.id !== dreamId));
     } catch (error) {
       console.error('Error deleting dream:', error);
@@ -61,10 +71,12 @@ const MyDreams: React.FC = () => {
     }
   };
 
+  // Loading state UI
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
+          {/* Loading spinner */}
           <svg className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -76,8 +88,9 @@ const MyDreams: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 lg:py-12">
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Page Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             My Dream{' '}
@@ -90,14 +103,18 @@ const MyDreams: React.FC = () => {
           </p>
         </div>
 
+        {/* Conditional Content: Empty State vs Dreams Grid */}
         {dreams.length === 0 ? (
+          /* Empty State - No dreams created yet */
           <div className="text-center py-12">
             <div className="bg-white rounded-xl shadow-lg p-8 max-w-md mx-auto">
+              {/* Empty state icon */}
               <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No dreams yet</h3>
               <p className="text-gray-600 mb-6">Start creating your first dream story!</p>
+              {/* Call-to-action button */}
               <Link to="/create-dream">
                 <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors">
                   Create Your First Dream ✨
@@ -106,6 +123,7 @@ const MyDreams: React.FC = () => {
             </div>
           </div>
         ) : (
+          /* Dreams Grid - Display user's dreams */
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {dreams.map((dream) => (
               <DreamCard 
@@ -115,16 +133,6 @@ const MyDreams: React.FC = () => {
                 onDelete={handleDelete}
               />
             ))}
-          </div>
-        )}
-
-        {dreams.length > 0 && (
-          <div className="text-center mt-12">
-            <Link to="/create-dream">
-              <button className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors shadow-lg">
-                Create Another Dream ✨
-              </button>
-            </Link>
           </div>
         )}
       </div>

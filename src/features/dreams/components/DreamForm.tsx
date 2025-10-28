@@ -1,140 +1,192 @@
 import { generateDreamStory, generateDreamImage } from "../services/openrouter";
 import type { DreamFormData } from "../types/dream";
 import { useState } from "react";
-import { Sparkles, Wand2, Image as ImageIcon, FileText, AlertCircle } from "lucide-react";
+import { Sparkles, Wand2, FileText, AlertCircle } from "lucide-react";
+import ApiQuotaModal from "./ApiQuotaModal";
+
+/**
+ * DreamForm Component
+ *
+ * Interactive form for creating dream stories with AI-generated content.
+ * Allows users to input dream details and generates both story and image.
+ *
+ * Features:
+ * - Dual input fields for title and description
+ * - Character count validation and limits
+ * - Real-time form validation
+ * - Multi-step AI generation (story then image)
+ * - Progress indicators during generation
+ * - Error handling with user-friendly messages
+ * - Responsive design with visual feedback
+ */
 
 interface DreamFormProps {
+  /** Callback function called when story and image generation is complete */
   onStoryGenerated: (story: string, dreamData: DreamFormData, image: string) => void;
 }
 
 const DreamForm: React.FC<DreamFormProps> = ({ onStoryGenerated }) => {
+  // Form state management
+  /** User input data for dream title and description */
   const [formData, setFormData] = useState<DreamFormData>({
     title: '',
     description: '',
   });
+  
+  /** Loading state during AI generation process */
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  /** Current step in the generation process (idle, story, image) */
   const [generationStep, setGenerationStep] = useState<'idle' | 'story' | 'image'>('idle');
+  
+  /** Error messages for form validation and generation failures */
   const [error, setError] = useState('');
+  
+  /** API quota modal state */
+  const [showQuotaModal, setShowQuotaModal] = useState(false);
+  const [quotaApiType, setQuotaApiType] = useState<'text' | 'image'>('text');
 
+  /**
+   * Handles input field changes and clears errors
+   * 
+   * @param e - React change event from input or textarea
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    
+    // Update form data with new value
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Clear error when user starts typing
     if (error) setError('');
   };
 
+  /**
+   * Handles form submission and AI generation process
+   * 
+   * @param e - React form submission event
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate required fields
     if (!formData.title.trim() || !formData.description.trim()) {
       setError('Please fill in both title and description');
       return;
     }
 
+    // Initialize generation process
     setIsGenerating(true);
     setError('');
     setGenerationStep('story');
 
     try {
-      // Generate story first
+      // Step 1: Generate story content using AI
       const story = await generateDreamStory(formData.title, formData.description);
       
-      // Then generate image
+      // Step 2: Generate accompanying image
       setGenerationStep('image');
       const image = await generateDreamImage(formData.description);
       
-      // Pass both to parent
+      // Pass generated content to parent component
       onStoryGenerated(story, formData, image);
       
-      // Reset form
+      // Reset form to initial state
       setFormData({ title: '', description: '' });
       setGenerationStep('idle');
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      setError(error.message || 'Failed to generate story or image');
+      // Check if it's a quota exceeded error
+      if (error.message?.includes('quota') || error.message?.includes('limit') || error.message?.includes('429')) {
+        setQuotaApiType(generationStep === 'story' ? 'text' : 'image');
+        setShowQuotaModal(true);
+      } else {
+        // Handle other generation errors with user-friendly messages
+        setError(error.message || 'Failed to generate story or image');
+      }
       setGenerationStep('idle');
     } finally {
+      // Always reset loading state
       setIsGenerating(false);
     }
   };
 
+  // Character count tracking for validation and UI feedback
   const charCount = formData.description.length;
   const titleCharCount = formData.title.length;
 
   return (
-    <div className="relative bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 rounded-2xl shadow-xl p-8 border border-gray-200 overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl -translate-y-32 translate-x-32 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-pink-200/20 to-purple-200/20 rounded-full blur-3xl translate-y-24 -translate-x-24 pointer-events-none" />
-      
-      <div className="relative z-10">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
-            <Wand2 className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Create Your Dream Story
-            </h2>
-            <p className="text-sm text-gray-600 mt-1">
-              Let AI bring your dreams to life with a story and image
-            </p>
-          </div>
+    <div className="bg-white rounded-xl shadow-lg p-6 lg:p-8 border border-gray-200 max-w-4xl mx-auto">
+      {/* Form Header Section */}
+      <div className="flex items-center gap-3 mb-6">
+        {/* Magic wand icon */}
+        <div className="p-3 bg-blue-600 rounded-lg">
+          <Wand2 className="w-6 h-6 text-white" />
         </div>
+        {/* Title and description */}
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900">
+            Create Your Dream Story
+          </h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Let AI bring your dreams to life with a story and image
+          </p>
+        </div>
+      </div>
         
+        {/* Dream Creation Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Title Input */}
+          {/* Dream Title Input Field */}
           <div className="group">
             <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
               <FileText className="w-4 h-4 text-blue-600" />
               Dream Title
+              {/* Character counter */}
               <span className="text-xs text-gray-500 font-normal ml-auto">
                 {titleCharCount}/100
               </span>
             </label>
-            <div className="relative">
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                maxLength={100}
-                placeholder="e.g., Flying Through Crystal Caves"
-                className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 group-hover:border-gray-300"
-              />
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/0 to-purple-500/0 group-focus-within:from-blue-500/5 group-focus-within:to-purple-500/5 transition-all duration-300 pointer-events-none" />
-            </div>
+            {/* Title input with character limit */}
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              maxLength={100}
+              placeholder="e.g., Flying Through Crystal Caves"
+              className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
           </div>
 
-          {/* Description Textarea */}
+          {/* Dream Description Textarea Field */}
           <div className="group">
             <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
               <Sparkles className="w-4 h-4 text-purple-600" />
               Dream Description
+              {/* Character counter */}
               <span className="text-xs text-gray-500 font-normal ml-auto">
                 {charCount}/500
               </span>
             </label>
-            <div className="relative">
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                maxLength={500}
-                placeholder="Describe your dream in vivid detail... What did you see? What did you feel? Let your imagination flow..."
-                rows={6}
-                className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none group-hover:border-gray-300"
-              />
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/0 to-purple-500/0 group-focus-within:from-blue-500/5 group-focus-within:to-purple-500/5 transition-all duration-300 pointer-events-none" />
-            </div>
+            {/* Multi-line description input with character limit */}
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              maxLength={500}
+              placeholder="Describe your dream in vivid detail... What did you see? What did you feel? Let your imagination flow..."
+              rows={6}
+              className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+            />
+            {/* Helpful tip for users */}
             <p className="mt-2 text-xs text-gray-500 flex items-center gap-1">
               <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
               Tip: The more details you provide, the more magical the result!
             </p>
           </div>
 
-          {/* Error Message */}
+          {/* Error Message Display */}
           {error && (
             <div className="flex items-start gap-3 p-4 bg-red-50 border-2 border-red-200 rounded-xl animate-in fade-in duration-300">
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
@@ -142,21 +194,14 @@ const DreamForm: React.FC<DreamFormProps> = ({ onStoryGenerated }) => {
             </div>
           )}
 
-          {/* Generation Progress */}
+          {/* AI Generation Progress Indicator */}
           {isGenerating && (
-            <div className="p-5 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl">
+            <div className="p-5 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-center gap-3 mb-3">
-                <div className="relative">
-                  <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {generationStep === 'story' ? (
-                      <FileText className="w-4 h-4 text-blue-600" />
-                    ) : (
-                      <ImageIcon className="w-4 h-4 text-purple-600" />
-                    )}
-                  </div>
-                </div>
+                {/* Loading spinner */}
+                <div className="w-8 h-8 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
                 <div className="flex-1">
+                  {/* Dynamic status message based on current step */}
                   <p className="text-sm font-semibold text-gray-800">
                     {generationStep === 'story' ? 'Crafting your dream story...' : 'Generating dream image...'}
                   </p>
@@ -165,26 +210,26 @@ const DreamForm: React.FC<DreamFormProps> = ({ onStoryGenerated }) => {
                   </p>
                 </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div className={`h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full transition-all duration-1000 ${
+              {/* Progress bar showing completion status */}
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className={`h-full bg-blue-600 rounded-full transition-all duration-1000 ${
                   generationStep === 'story' ? 'w-1/2' : 'w-full'
                 }`} />
               </div>
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* Form Submit Button */}
           <button
             type="submit"
             disabled={isGenerating || !formData.title.trim() || !formData.description.trim()}
-            className="group relative w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 text-white font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500/50 shadow-lg hover:shadow-xl disabled:shadow-none transform hover:-translate-y-0.5 active:translate-y-0 disabled:transform-none overflow-hidden"
+            className="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {/* Button shine effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
-            
-            <span className="relative flex items-center justify-center gap-2">
+            {/* Dynamic button content based on generation state */}
+            <span className="flex items-center justify-center gap-2">
               {isGenerating ? (
                 <>
+                  {/* Loading spinner during generation */}
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Generating...
                 </>
@@ -197,16 +242,24 @@ const DreamForm: React.FC<DreamFormProps> = ({ onStoryGenerated }) => {
             </span>
           </button>
 
-          {/* Character count hints */}
+          {/* Footer Information */}
           <div className="flex items-center justify-between text-xs text-gray-500 pt-2">
+            {/* Service availability notice */}
             <span className="flex items-center gap-1">
               <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full"></span>
               Free generations may be unavailable
             </span>
+            {/* AI attribution */}
             <span>Powered by AI</span>
           </div>
         </form>
-      </div>
+
+        {/* API Quota Modal */}
+        <ApiQuotaModal
+          isOpen={showQuotaModal}
+          onClose={() => setShowQuotaModal(false)}
+          apiType={quotaApiType}
+        />
     </div>
   );
 };

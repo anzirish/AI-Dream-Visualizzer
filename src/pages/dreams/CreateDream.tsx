@@ -2,17 +2,49 @@ import React, { useState } from 'react';
 import { DreamForm, StoryDisplay } from '@/features/dreams';
 import type { DreamFormData } from '@/features/dreams';
 
+/**
+ * CreateDream Page Component
+ *
+ * Main page for creating new dream stories using AI generation.
+ * Provides a two-step workflow: dream input and story display/editing.
+ *
+ * Features:
+ * - Two-phase UI: form input → story display
+ * - AI-powered story and image generation
+ * - Reset functionality to start over
+ * - Instructional content for user guidance
+ * - Responsive layout for all screen sizes
+ * - Integration with DreamForm and StoryDisplay components
+ */
 const CreateDream: React.FC = () => {
+  // State management for the dream creation workflow
+  /** AI-generated story content, null when not yet generated */
   const [generatedStory, setGeneratedStory] = useState<string | null>(null);
+  
+  /** AI-generated image URL */
   const [generatedImage, setGeneratedImage] = useState<string>('');
+  
+  /** Original form data from user input */
   const [dreamData, setDreamData] = useState<DreamFormData | null>(null);
 
+  /**
+   * Handles successful story generation from DreamForm
+   * Transitions from form view to story display view
+   * 
+   * @param story - AI-generated story content
+   * @param formData - Original user input data
+   * @param image - AI-generated image URL
+   */
   const handleStoryGenerated = (story: string, formData: DreamFormData, image: string) => {
     setGeneratedStory(story);
     setGeneratedImage(image);
     setDreamData(formData);
   };
 
+  /**
+   * Resets the creation workflow back to the initial form state
+   * Allows users to start over with a new dream
+   */
   const handleReset = () => {
     setGeneratedStory(null);
     setGeneratedImage('');
@@ -20,9 +52,10 @@ const CreateDream: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        {/* Page Header */}
+        <div className="text-center mb-8 max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Transform Your{' '}
             <span className="text-blue-600">
@@ -35,10 +68,13 @@ const CreateDream: React.FC = () => {
           </p>
         </div>
 
-        <div className="space-y-8">
+        {/* Main Content Area - Conditional rendering based on workflow state */}
+        <div className="space-y-8 max-w-6xl mx-auto">
           {!generatedStory ? (
+            /* Phase 1: Dream Input Form */
             <DreamForm onStoryGenerated={handleStoryGenerated} />
           ) : (
+            /* Phase 2: Generated Story Display and Editing */
             dreamData && (
               <StoryDisplay 
                 story={generatedStory}
@@ -50,10 +86,11 @@ const CreateDream: React.FC = () => {
           )}
         </div>
 
-        {/* Instructions */}
-        <div className="mt-12 bg-blue-50 rounded-xl p-6 border border-blue-200">
-          <h3 className="text-lg font-semibold text-blue-900 mb-3">How it works:</h3>
-          <div className="grid md:grid-cols-3 gap-4 text-sm text-blue-800">
+        {/* User Instructions Section */}
+        <div className="mt-12 bg-blue-50 rounded-lg p-6 border border-blue-200 max-w-4xl mx-auto">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">How it works:</h3>
+          {/* Three-step process explanation */}
+          <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-700">
             <div className="flex items-start space-x-2">
               <span className="font-bold text-blue-600">1.</span>
               <span>Enter your dream title and description</span>
