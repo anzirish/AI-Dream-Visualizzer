@@ -1,9 +1,9 @@
 # 🌙 AI Dreams - Transform Your Dreams into Stories
 
-[![Deploy Status](https://img.shields.io/badge/Status-Production%20-brightgreen)](https://github.com/your-username/ai-dreams)
-[![Frontend](https://img.shields.io/badge/Frontend-React%2019-blue)](https://reactjs.org/)
-[![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-green)](https://nodejs.org/)
-[![Database](https://img.shields.io/badge/Database-MongoDB-green)](https://mongodb.com/)
+[![Deploy Status](https://img.shields.io/badge/Status-Production%20-brightgreen)](https://github.com/anzirish/AI-Dream-Visualizzer)
+[![Frontend](https://img.shields.io/badge/Frontend-React%2019-blue)](https://ai-dream-visualizzer.vercel.app/)
+[![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-green)](https://ai-dream-visualizzer.onrender.com/)
+[![Database](https://img.shields.io/badge/Database-MongoDB-green)](https://cloud.mongodb.com/)
 [![AI](https://img.shields.io/badge/AI-OpenRouter%20%2B%20Stable%20Diffusion-purple)](https://openrouter.ai/)
 
 ## 🚀 Introduction
@@ -235,19 +235,6 @@ npm run dev          # Start development server with nodemon
 npm run build        # Compile TypeScript to JavaScript
 npm start            # Start production server
 npm test             # Run tests (Jest)
-```
-
-### **API Testing**
-
-Use the comprehensive Postman collection in `server/tests.postman/`:
-
-```bash
-# Import files into Postman:
-# - AI_Dreams_API.postman_collection.json
-# - AI_Dreams_Environment.postman_environment.json
-
-# Follow the testing guide:
-# server/tests.postman/POSTMAN_TESTING_GUIDE.md
 ```
 
 ## 🌐 Deployment
