@@ -435,6 +435,7 @@ This project is licensed under the MIT License.
 
 - **Project**: AI Dreams Visualizer - Transform Your Dreams into Stories
 - **Version**: 1.0.0
+- **Associated Id : Mongo/Vercel/Render**: oknoktrial@gmail.com
 - **Status**: ✅ In prdouction
 
 ---
