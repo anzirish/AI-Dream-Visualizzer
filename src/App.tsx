@@ -6,22 +6,43 @@ import Signup from "./pages/auth/Signup";
 import CreateDream from "./pages/dreams/CreateDream";
 import MyDreams from "./pages/dreams/MyDreams";
 import DreamDetail from "./pages/dreams/DreamDetail";
+import ApiKeySettings from "./pages/ApiKeySettings";
 import { NavBar } from "@/shared/components/layout";
+// Environment variables are automatically loaded from env.ts
 
+/**
+ * App Component - Root Application Component
+ *
+ * Main application component that sets up routing, authentication context,
+ * and the overall application structure for the AI Dreams app.
+ *
+ * Features:
+ * - React Router for client-side routing
+ * - Authentication context provider for global auth state
+ * - Protected routes for authenticated-only pages
+ * - Public routes accessible to all users
+ * - Persistent navigation bar across all pages
+ * - Responsive layout with minimum height viewport
+ */
 function App() {
   return (
+    // Authentication context provider - manages global auth state
     <AuthProvider>
+      {/* React Router for client-side navigation */}
       <Router>
         <div className="min-h-screen bg-white">
+          {/* Persistent navigation bar across all pages */}
           <NavBar />
+
+          {/* Application routes configuration */}
           <Routes>
-            {/* Public routes - no auth required */}
+            {/* Public Routes - Accessible without authentication */}
             <Route path="/" element={<Home />} />
             <Route path="/dream/:dreamId" element={<DreamDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
-            {/* Protected routes - auth required */}
+            {/* Protected Routes - Require user authentication */}
             <Route
               path="/create-dream"
               element={
@@ -35,6 +56,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <MyDreams />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/api-settings"
+              element={
+                <ProtectedRoute>
+                  <ApiKeySettings />
                 </ProtectedRoute>
               }
             />
