@@ -27,12 +27,6 @@ export const apiDocumentation = {
         "DELETE /api/v1/dreams/:id",
       ],
       ai: ["POST /api/v1/ai/generate-story", "POST /api/v1/ai/generate-image", "POST /api/v1/ai/generate-complete"],
-      apiKeys: [
-        "POST /api/v1/api-keys",
-        "GET /api/v1/api-keys/my",
-        "GET /api/v1/api-keys/stats",
-        "DELETE /api/v1/api-keys/:id",
-      ],
     },
     analytics: [
       "GET /api/analytics/overview",
