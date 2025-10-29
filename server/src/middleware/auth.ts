@@ -112,6 +112,7 @@ export const optionalAuth = async (req: AuthenticatedRequest, res: Response, nex
 
     // Always continue to next middleware, regardless of auth status
     next();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // Silently ignore authentication errors for optional auth
     // This allows the request to proceed without user context

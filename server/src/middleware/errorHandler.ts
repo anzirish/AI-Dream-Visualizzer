@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response, NextFunction } from "express";
 
 /**
@@ -50,6 +51,7 @@ export class ApiError extends Error {
  * @param next - Express next function (unused but required for error middleware)
  *
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction): void => {
   // Create a copy of the error to avoid mutation
   let error = { ...err } as ApiError;
@@ -106,7 +108,5 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
   res.status(error.statusCode || 500).json({
     success: false,
     message: error.message || "Server Error",
-    // Include stack trace only in development environment
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
   });
 };
