@@ -1,13 +1,11 @@
 /**
  * Backend API service for AI Dreams
- * Handles authentication and dream operations with local backend
  */
 
-import { env } from "@/config/env";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
 
-const API_BASE_URL = env.API_BASE_URL;
-
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;
@@ -18,11 +16,6 @@ interface User {
   name: string;
   email: string;
   createdAt: string;
-}
-
-interface AuthResponse {
-  user: User;
-  token: string;
 }
 
 interface Dream {
@@ -37,6 +30,14 @@ interface Dream {
   createdAt: string;
 }
 
+interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
 class BackendAPI {
   private token: string | null = null;
 
@@ -45,8 +46,12 @@ class BackendAPI {
     this.token = localStorage.getItem("authToken");
   }
 
-  private getHeaders(): HeadersInit {
-    const headers: HeadersInit = {
+  // Record<K, V> is a TypeScript utility type that creates an object type where:
+  // K = the type of the keys
+  // V = the type of the values
+
+  private getHeaders(): Record<string, string> {
+    const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
 
@@ -57,71 +62,53 @@ class BackendAPI {
     return headers;
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`;
+  // RequestInit is the built-in TypeScript type for the options object 
+  // that you pass to the fetch() function. It defines all the possible 
+  // configuration options for an HTTP request.
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers: { ...this.getHeaders(), ...options.headers },
+    });
 
-    // Add timeout to requests
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 seconds
-
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers: {
-          ...this.getHeaders(),
-          ...options.headers,
-        },
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-      }
-
-      return response.json();
-    } catch (error) {
-      clearTimeout(timeoutId);
-
-      if (error instanceof Error && error.name === "AbortError") {
-        throw new Error("Request timeout - please check your connection");
-      }
-
-      throw error;
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `HTTP error! status: ${response.status}`
+      );
     }
+
+    return response.json();
   }
 
   // Authentication methods
   async signup(name: string, email: string, password: string): Promise<User> {
-    const response = await this.request<ApiResponse<AuthResponse>>("/auth/signup", {
+    const response = await this.request<
+      ApiResponse<{ user: User; token: string }>
+    >("/auth/signup", {
       method: "POST",
       body: JSON.stringify({ name, email, password }),
     });
 
-    if (response.data) {
-      this.token = response.data.token;
-      localStorage.setItem("authToken", this.token);
-      return response.data.user;
-    }
-
-    throw new Error("Signup failed");
+    this.token = response.data!.token;
+    localStorage.setItem("authToken", this.token);
+    return response.data!.user;
   }
 
   async login(email: string, password: string): Promise<User> {
-    const response = await this.request<ApiResponse<AuthResponse>>("/auth/login", {
+    const response = await this.request<
+      ApiResponse<{ user: User; token: string }>
+    >("/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
 
-    if (response.data) {
-      this.token = response.data.token;
-      localStorage.setItem("authToken", this.token);
-      return response.data.user;
-    }
-
-    throw new Error("Login failed");
+    this.token = response.data!.token;
+    localStorage.setItem("authToken", this.token);
+    return response.data!.user;
   }
 
   async logout(): Promise<void> {
@@ -137,10 +124,11 @@ class BackendAPI {
     if (!this.token) return null;
 
     try {
-      const response = await this.request<ApiResponse<{ user: User }>>("/auth/me");
+      const response = await this.request<ApiResponse<{ user: User }>>(
+        "/auth/me"
+      );
       return response.data?.user || null;
-    } catch (error) {
-      // Token might be invalid, clear it
+    } catch {
       this.token = null;
       localStorage.removeItem("authToken");
       return null;
@@ -155,41 +143,26 @@ class BackendAPI {
     generatedImage?: string;
     isPublic?: boolean;
   }): Promise<Dream> {
-    const response = await this.request<ApiResponse<{ dream: Dream }>>("/dreams", {
-      method: "POST",
-      body: JSON.stringify(dreamData),
-    });
-
-    if (response.data) {
-      return response.data.dream;
-    }
-
-    throw new Error("Failed to create dream");
+    const response = await this.request<ApiResponse<{ dream: Dream }>>(
+      "/dreams",
+      { method: "POST", body: JSON.stringify(dreamData) }
+    );
+    return response.data!.dream;
   }
 
   async getMyDreams(): Promise<Dream[]> {
-    const response = await this.request<ApiResponse<{ dreams: Dream[] }>>("/dreams/my");
+    const response = await this.request<ApiResponse<{ dreams: Dream[] }>>(
+      "/dreams/my"
+    );
     return response.data?.dreams || [];
   }
 
   async getPublicDreams(
     page = 1,
     limit = 20
-  ): Promise<{
-    dreams: Dream[];
-    pagination: {
-      currentPage: number;
-      totalPages: number;
-      totalCount: number;
-      hasNext: boolean;
-      hasPrev: boolean;
-    };
-  }> {
+  ): Promise<{ dreams: Dream[]; pagination: Pagination }> {
     const response = await this.request<
-      ApiResponse<{
-        dreams: Dream[];
-        pagination: any;
-      }>
+      ApiResponse<{ dreams: Dream[]; pagination: Pagination }>
     >(`/dreams/public?page=${page}&limit=${limit}`);
 
     return {
@@ -205,33 +178,21 @@ class BackendAPI {
   }
 
   async getDreamById(id: string): Promise<Dream> {
-    const response = await this.request<ApiResponse<{ dream: Dream }>>(`/dreams/${id}`);
-
-    if (response.data) {
-      return response.data.dream;
-    }
-
-    throw new Error("Dream not found");
+    const response = await this.request<ApiResponse<{ dream: Dream }>>(
+      `/dreams/${id}`
+    );
+    return response.data!.dream;
   }
 
   async updateDream(
     id: string,
-    updates: {
-      title?: string;
-      description?: string;
-      isPublic?: boolean;
-    }
+    updates: { title?: string; description?: string; isPublic?: boolean }
   ): Promise<Dream> {
-    const response = await this.request<ApiResponse<{ dream: Dream }>>(`/dreams/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(updates),
-    });
-
-    if (response.data) {
-      return response.data.dream;
-    }
-
-    throw new Error("Failed to update dream");
+    const response = await this.request<ApiResponse<{ dream: Dream }>>(
+      `/dreams/${id}`,
+      { method: "PUT", body: JSON.stringify(updates) }
+    );
+    return response.data!.dream;
   }
 
   async deleteDream(id: string): Promise<void> {
@@ -239,65 +200,21 @@ class BackendAPI {
   }
 
   // AI methods
-  async generateStory(title: string, description: string): Promise<string> {
-    const response = await this.request<ApiResponse<{ story: string }>>("/ai/generate-story", {
+  async generateCompleteDream(
+    title: string,
+    description: string
+  ): Promise<{ story: string; image?: string }> {
+    const response = await this.request<
+      ApiResponse<{ story: string; image?: string }>
+    >("/ai/generate-complete", {
       method: "POST",
       body: JSON.stringify({ title, description }),
     });
 
-    return response.data?.story || "";
-  }
-
-  async generateImage(description: string): Promise<string> {
-    const response = await this.request<ApiResponse<{ image: string }>>("/ai/generate-image", {
-      method: "POST",
-      body: JSON.stringify({ description }),
-    });
-
-    return response.data?.image || "";
-  }
-
-  async generateCompleteDream(
-    title: string,
-    description: string,
-    includeImage = false
-  ): Promise<{ story: string; image?: string }> {
-    const response = await this.request<
-      ApiResponse<{
-        story: string;
-        image?: string;
-      }>
-    >("/ai/generate-complete", {
-      method: "POST",
-      body: JSON.stringify({ title, description, includeImage }),
-    });
-
     return {
       story: response.data?.story || "",
-      image: response.data?.image || undefined,
+      image: response.data?.image,
     };
-  }
-
-  // API Key methods
-  async addApiKey(keyType: "openrouter" | "stable_diffusion", apiKey: string): Promise<void> {
-    await this.request("/api-keys", {
-      method: "POST",
-      body: JSON.stringify({ keyType, apiKey }),
-    });
-  }
-
-  async getMyApiKeys(): Promise<any[]> {
-    const response = await this.request<ApiResponse<{ apiKeys: any[] }>>("/api-keys/my");
-    return response.data?.apiKeys || [];
-  }
-
-  async getApiKeyStats(): Promise<any> {
-    const response = await this.request<ApiResponse<{ stats: any }>>("/api-keys/stats");
-    return response.data?.stats || [];
-  }
-
-  async deleteApiKey(id: string): Promise<void> {
-    await this.request(`/api-keys/${id}`, { method: "DELETE" });
   }
 
   // Utility methods
