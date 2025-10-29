@@ -1,6 +1,5 @@
 import { Response, NextFunction } from "express";
 import Dream from "../models/Dream";
-import User from "../models/User";
 import { ApiError } from "../middleware/errorHandler";
 import { AuthenticatedRequest } from "../middleware/auth";
 
@@ -20,9 +19,14 @@ import { AuthenticatedRequest } from "../middleware/auth";
  * @throws {ApiError} 401 - When user is not authenticated
  * @throws {ApiError} 400 - When required fields are missing
  */
-export const createDream = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const createDream = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    const { title, description, generatedStory, generatedImage, isPublic } = req.body;
+    const { title, description, generatedStory, generatedImage, isPublic } =
+      req.body;
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -31,7 +35,10 @@ export const createDream = async (req: AuthenticatedRequest, res: Response, next
 
     // Validate required fields
     if (!title || !description || !generatedStory) {
-      throw new ApiError(400, "Title, description, and generated story are required");
+      throw new ApiError(
+        400,
+        "Title, description, and generated story are required"
+      );
     }
 
     // Create new dream
@@ -73,7 +80,11 @@ export const createDream = async (req: AuthenticatedRequest, res: Response, next
  * Get user's dreams
  * GET /api/v1/dreams/my
  */
-export const getMyDreams = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const getMyDreams = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const userId = req.user?.userId;
 
@@ -81,7 +92,9 @@ export const getMyDreams = async (req: AuthenticatedRequest, res: Response, next
       throw new ApiError(401, "User not authenticated");
     }
 
-    const dreams = await Dream.find({ userId }).sort({ createdAt: -1 }).limit(50);
+    const dreams = await Dream.find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(50);
 
     res.status(200).json({
       success: true,
@@ -109,13 +122,20 @@ export const getMyDreams = async (req: AuthenticatedRequest, res: Response, next
  * Get public dreams feed
  * GET /api/v1/dreams/public
  */
-export const getPublicDreams = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const getPublicDreams = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page - 1) * limit;
 
-    const dreams = await Dream.find({ isPublic: true }).sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const dreams = await Dream.find({ isPublic: true })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     const totalCount = await Dream.countDocuments({ isPublic: true });
 
@@ -151,7 +171,11 @@ export const getPublicDreams = async (req: AuthenticatedRequest, res: Response, 
  * Get single dream by ID
  * GET /api/v1/dreams/:id
  */
-export const getDreamById = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const getDreamById = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user?.userId;
@@ -191,7 +215,11 @@ export const getDreamById = async (req: AuthenticatedRequest, res: Response, nex
  * Update dream
  * PUT /api/v1/dreams/:id
  */
-export const updateDream = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const updateDream = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { id } = req.params;
     const { title, description, isPublic } = req.body;
@@ -244,7 +272,11 @@ export const updateDream = async (req: AuthenticatedRequest, res: Response, next
  * Delete dream
  * DELETE /api/v1/dreams/:id
  */
-export const deleteDream = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const deleteDream = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user?.userId;

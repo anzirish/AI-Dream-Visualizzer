@@ -116,7 +116,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 export const getMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     // User ID is attached by auth middleware
-    const userId = (req as any).user?.userId;
+    const userId = (req as { user?: { userId: string } }).user?.userId;
 
     if (!userId) {
       throw new ApiError(401, "User not authenticated");
