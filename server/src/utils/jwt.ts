@@ -43,7 +43,6 @@ export const generateToken = (userId: Types.ObjectId, email: string): string => 
   }
 
   // Get token expiration time from environment or use default
-  const expiresIn = process.env.JWT_EXPIRE || "7d";
 
   // Sign and return the JWT token
   return jwt.sign(payload, secret, { expiresIn: "7d" });
