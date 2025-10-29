@@ -1,4 +1,4 @@
-import { ApiKey } from "../models/ApiKey";
+// Removed ApiKey import - using environment variables only
 
 /**
  * OpenRouter API Response Interface
@@ -23,73 +23,33 @@ const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = "mistralai/mistral-7b-instruct:free";
 
 /** Stability AI endpoint for image generation */
-const STABLE_DIFFUSION_URL = "https://api.stability.ai/v2beta/stable-image/generate/core";
+const STABLE_DIFFUSION_URL =
+  "https://api.stability.ai/v2beta/stable-image/generate/core";
 
 /**
+ * Get API Key from Environment Variables
+ *
+ * Retrieves API keys from environment variables only.
+ * No database lookup or user-submitted keys.
+ *
  * @param keyType - Type of API key needed ('openrouter' or 'stable_diffusion')
- * @returns Promise resolving to API key string
+ * @returns API key string from environment variables
  *
- * @throws {Error} When no API keys are available for the specified service
-
+ * @throws {Error} When environment variable is not configured
  */
-const getApiKey = async (keyType: "openrouter" | "stable_diffusion"): Promise<string> => {
-  // Get environment variable as fallback option
-  const envKey = keyType === "openrouter" ? process.env.OPENROUTER_API_KEY : process.env.STABLE_DIFFUSION_API_KEY;
+const getApiKey = (keyType: "openrouter" | "stable_diffusion"): string => {
+  const envKey =
+    keyType === "openrouter"
+      ? process.env.OPENROUTER_API_KEY
+      : process.env.STABLE_DIFFUSION_API_KEY;
 
-  try {
-    // Query for least-used active key to implement load balancing
-    const apiKeyDoc = await ApiKey.findOne({
-      keyType,
-      isActive: true,
-    }).sort({ usageCount: 1 }); // Sort by usage count (ascending)
-
-    if (apiKeyDoc) {
-      // Update usage statistics atomically
-      await ApiKey.findByIdAndUpdate(apiKeyDoc._id, {
-        $inc: { usageCount: 1 }, // Increment usage counter
-        lastUsedAt: new Date(), // Update last used timestamp
-      });
-
-      return apiKeyDoc.apiKey;
-    }
-
-    // Fallback to environment variable if no community keys available
-    if (envKey) {
-      return envKey;
-    }
-
-    throw new Error(`No ${keyType} API key available`);
-  } catch (error) {
-    console.error(`Error getting ${keyType} key:`, error);
-
-    // Final fallback to environment variable
-    if (envKey) {
-      return envKey;
-    }
-
-    throw new Error(`No ${keyType} API key configured`);
+  if (!envKey) {
+    throw new Error(
+      `${keyType.toUpperCase()}_API_KEY environment variable is not configured`
+    );
   }
-};
 
-/**
- * Mark API Key as Failed
- *
- * Disables an API key when it encounters errors (quota exceeded, invalid key, etc.).
- * This prevents the system from repeatedly trying to use a non-functional key
- * and helps maintain service reliability.
- *
- * @param keyType - Type of API key that failed
- * @param apiKey - The specific API key string that failed
- * @returns Promise that resolves when key is marked as inactive
- */
-const markKeyFailed = async (keyType: "openrouter" | "stable_diffusion", apiKey: string): Promise<void> => {
-  try {
-    // Deactivate the failed key in the database
-    await ApiKey.findOneAndUpdate({ keyType, apiKey }, { isActive: false });
-  } catch (error) {
-    // Log error but don't throw - this is a background operation
-    console.error("Error marking key as failed:", error);
-  }
+  return envKey;
 };
 
 /**
@@ -105,7 +65,10 @@ const markKeyFailed = async (keyType: "openrouter" | "stable_diffusion", apiKey:
  *
  * @throws {Error} When no API keys are available or generation fails
  */
-export const generateDreamStory = async (title: string, description: string): Promise<string> => {
+export const generateDreamStory = async (
+  title: string,
+  description: string
+): Promise<string> => {
   const prompt = `You are a skilled dream interpreter and storyteller. Transform the following dream into a compelling narrative.
 
 Dream Title: "${title}"
@@ -122,7 +85,7 @@ Rewrite this dream as a vivid, immersive story in 3-4 paragraphs. Use rich senso
 Important: Do not use markdown formatting, headers, or special characters. Write in plain text with natural paragraph breaks.`;
 
   try {
-    const openRouterKey = await getApiKey("openrouter");
+    const openRouterKey = getApiKey("openrouter");
 
     const response = await fetch(OPENROUTER_URL, {
       method: "POST",
@@ -135,7 +98,7 @@ Important: Do not use markdown formatting, headers, or special characters. Write
       body: JSON.stringify({
         model: MODEL,
         messages: [{ role: "user", content: prompt }],
-        max_tokens: 600,
+        max_tokens: 1000,
         temperature: 0.9,
       }),
     });
@@ -143,12 +106,6 @@ Important: Do not use markdown formatting, headers, or special characters. Write
     if (!response.ok) {
       const errorText = await response.text();
       console.error("OpenRouter API error:", errorText);
-
-      // If quota exceeded, mark key as failed
-      if (response.status === 429 || response.status === 402) {
-        await markKeyFailed("openrouter", openRouterKey);
-      }
-
       throw new Error(`OpenRouter API error: ${response.status}`);
     }
 
@@ -162,7 +119,10 @@ Important: Do not use markdown formatting, headers, or special characters. Write
 
     // Clean up the response - simplified regex patterns
     const cleanupPatterns = [
-      [/<s>|<\/s>|\[B_ANSWER\]|\[INST\]|\[\/INST\]|\[PROMPT\]|\[\/PROMPT\]/g, ""],
+      [
+        /<s>|<\/s>|\[B_ANSWER\]|\[INST\]|\[\/INST\]|\[PROMPT\]|\[\/PROMPT\]/g,
+        "",
+      ],
       [/^["']|["']$/g, ""],
       [/^\*+|\*+$/g, ""],
       [/#{1,6}\s*/g, ""],
@@ -175,7 +135,11 @@ Important: Do not use markdown formatting, headers, or special characters. Write
     ];
 
     story = cleanupPatterns
-      .reduce((text, [pattern, replacement]) => text.replace(pattern as RegExp, replacement as string), story)
+      .reduce(
+        (text, [pattern, replacement]) =>
+          text.replace(pattern as RegExp, replacement as string),
+        story
+      )
       .trim();
 
     return story;
@@ -188,9 +152,11 @@ Important: Do not use markdown formatting, headers, or special characters. Write
 /**
  * Generate AI image from dream description
  */
-export const generateDreamImage = async (description: string): Promise<string> => {
+export const generateDreamImage = async (
+  description: string
+): Promise<string> => {
   try {
-    const stableDiffusionKey = await getApiKey("stable_diffusion");
+    const stableDiffusionKey = getApiKey("stable_diffusion");
 
     const formData = new FormData();
     formData.append("prompt", `Dreamlike surreal scene: ${description}`);
@@ -212,12 +178,6 @@ export const generateDreamImage = async (description: string): Promise<string> =
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Stable Diffusion API error:", errorText);
-
-      // If quota exceeded, mark key as failed
-      if (response.status === 429 || response.status === 402) {
-        await markKeyFailed("stable_diffusion", stableDiffusionKey);
-      }
-
       throw new Error(`Stable Diffusion API error: ${response.status}`);
     }
 
