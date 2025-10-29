@@ -44,7 +44,7 @@ router.get("/overview", async (req, res, next) => {
  */
 router.get("/user/stats", authenticate, async (req, res, next) => {
   try {
-    const userId = (req as any).user?.userId;
+    const userId = (req as { user?: { userId: string } }).user?.userId;
 
     if (!userId) {
       throw new ApiError(401, "User not authenticated");
