@@ -107,18 +107,8 @@ const LoginForm: React.FC = () => {
       navigate("/");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      // Handle specific authentication errors with user-friendly messages
-      if (error.code === "auth/user-not-found") {
-        setAuthError("No account found with this email address.");
-      } else if (error.code === "auth/wrong-password") {
-        setAuthError("Incorrect password.");
-      } else if (error.code === "auth/invalid-email") {
-        setAuthError("Invalid email address.");
-      } else if (error.code === "auth/too-many-requests") {
-        setAuthError("Too many failed attempts. Please try again later.");
-      } else {
-        setAuthError("An error occurred. Please try again.");
-      }
+      // Handle authentication errors with backend error message
+      setAuthError(error.message || "Login failed. Please try again.");
     } finally {
       // Always reset loading state
       setIsLoading(false);
@@ -142,7 +132,7 @@ const LoginForm: React.FC = () => {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              placeholder="you@example.com"
+              placeholder="dev@example.com"
               autoComplete="email"
               className={`w-full px-4 py-3 bg-white border-2 rounded-xl shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.email

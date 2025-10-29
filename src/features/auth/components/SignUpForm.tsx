@@ -2,11 +2,23 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import type { SignupFormData } from "../types/auth";
-import { validateEmail, validatePassword, validateName, validateConfirmPassword } from "@/shared/utils/validation";
+import {
+  validateEmail,
+  validatePassword,
+  validateName,
+  validateConfirmPassword,
+} from "@/shared/utils/validation";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { User, Mail, Lock, CheckCircle2, AlertCircle, UserPlus } from "lucide-react";
+import {
+  User,
+  Mail,
+  Lock,
+  CheckCircle2,
+  AlertCircle,
+  UserPlus,
+} from "lucide-react";
 
 /**
  * SignUpForm Component
@@ -85,7 +97,10 @@ const SignupForm: React.FC = () => {
     const passwordError = validatePassword(formData.password);
     if (passwordError) newErrors.password = passwordError;
 
-    const confirmPasswordError = validateConfirmPassword(formData.password, formData.confirmPassword);
+    const confirmPasswordError = validateConfirmPassword(
+      formData.password,
+      formData.confirmPassword
+    );
     if (confirmPasswordError) newErrors.confirmPassword = confirmPasswordError;
 
     // Update error state and return validation result
@@ -116,16 +131,11 @@ const SignupForm: React.FC = () => {
       navigate("/");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      // Handle specific authentication errors with user-friendly messages
-      if (error.code === "auth/email-already-in-use") {
-        setAuthError("An account with this email already exists.");
-      } else if (error.code === "auth/invalid-email") {
-        setAuthError("Invalid email address.");
-      } else if (error.code === "auth/weak-password") {
-        setAuthError("Password is too weak.");
-      } else {
-        setAuthError("An error occurred while creating your account. Please try again.");
-      }
+      // Handle authentication errors with backend error message
+      setAuthError(
+        error.message ||
+          "An error occurred while creating your account. Please try again."
+      );
     } finally {
       // Always reset loading state
       setIsLoading(false);
@@ -147,7 +157,7 @@ const SignupForm: React.FC = () => {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="John Doe"
+              placeholder="Tanishq D"
               autoComplete="name"
               className={`w-full px-4 py-3 bg-white border-2 rounded-xl shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 ${
                 errors.name
@@ -176,7 +186,7 @@ const SignupForm: React.FC = () => {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              placeholder="you@example.com"
+              placeholder="dev@example.com"
               autoComplete="email"
               className={`w-full px-4 py-3 bg-white border-2 rounded-xl shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.email
@@ -253,10 +263,15 @@ const SignupForm: React.FC = () => {
 
         {/* Auth Error */}
         {authError && (
-          <Alert variant="destructive" className="border-2 border-red-300 bg-red-50">
+          <Alert
+            variant="destructive"
+            className="border-2 border-red-300 bg-red-50"
+          >
             <div className="flex items-start gap-2">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <AlertDescription className="text-red-800 font-medium">{authError}</AlertDescription>
+              <AlertDescription className="text-red-800 font-medium">
+                {authError}
+              </AlertDescription>
             </div>
           </Alert>
         )}
