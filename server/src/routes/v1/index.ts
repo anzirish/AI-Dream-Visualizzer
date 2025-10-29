@@ -2,7 +2,6 @@ import { Router } from "express";
 import authRoutes from "./auth";
 import dreamRoutes from "./dreams";
 import aiRoutes from "./ai";
-import apiKeyRoutes from "./apiKeys";
 
 /** Express router instance for v1 API endpoints */
 const router = Router();
@@ -17,7 +16,6 @@ const router = Router();
  * - /api/v1/auth - User authentication and account management
  * - /api/v1/dreams - Dream CRUD operations and community features
  * - /api/v1/ai - AI content generation services
- * - /api/v1/api-keys - Community API key management
  * - /api/v1/health - API health check endpoint
  */
 
@@ -29,9 +27,6 @@ router.use("/dreams", dreamRoutes);
 
 /** AI content generation service routes */
 router.use("/ai", aiRoutes);
-
-/** Community API key management routes */
-router.use("/api-keys", apiKeyRoutes);
 
 /**
  * API v1 Health Check Endpoint
@@ -46,7 +41,7 @@ router.get("/health", (req, res) => {
   res.status(200).json({
     success: true,
     message: "AI Dreams API v1 is running",
-    version: "1.0.0",
+    version: "1.1.0",
     timestamp: new Date().toISOString(),
   });
 });
