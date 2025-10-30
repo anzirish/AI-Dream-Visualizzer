@@ -9,4 +9,4 @@ export { default as StoryDisplay } from './components/StoryDisplay';
 // Note: Individual generation functions removed - use dreamService.generateCompleteDream instead
 
 // Types
-export type { Dream, DreamFormData, OpenRouterResponse } from './types/dream';
+export type { Dream, DreamFormData } from './types/dream';

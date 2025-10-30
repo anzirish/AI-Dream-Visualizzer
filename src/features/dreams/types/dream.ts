@@ -45,16 +45,4 @@ export interface DreamFormData {
   isPublic?: boolean;
 }
 
-/**
- * Response structure from OpenRouter AI API
- */
-export interface OpenRouterResponse {
-  /** Array of AI-generated response choices */
-  choices: {
-    /** Message containing the AI-generated content */
-    message: {
-      /** The actual generated text content */
-      content: string;
-    };
-  }[];
-}
+
