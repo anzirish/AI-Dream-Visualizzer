@@ -1,4 +1,4 @@
-// Components
+// Components. Importing as default and reExporting as named
 export { default as LoginForm } from "./components/LoginForm";
 export { default as SignUpForm } from "./components/SignUpForm";
 export { default as ProtectedRoute } from "./components/ProtectedRoute";
