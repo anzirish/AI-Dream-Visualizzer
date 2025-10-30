@@ -85,26 +85,6 @@ const CreateDream: React.FC = () => {
             )
           )}
         </div>
-
-        {/* User Instructions Section */}
-        <div className="mt-12 bg-blue-50 rounded-lg p-6 border border-blue-200 max-w-4xl mx-auto">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">How it works:</h3>
-          {/* Three-step process explanation */}
-          <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-700">
-            <div className="flex items-start space-x-2">
-              <span className="font-bold text-blue-600">1.</span>
-              <span>Enter your dream title and description</span>
-            </div>
-            <div className="flex items-start space-x-2">
-              <span className="font-bold text-blue-600">2.</span>
-              <span>AI transforms it into a creative story with image</span>
-            </div>
-            <div className="flex items-start space-x-2">
-              <span className="font-bold text-blue-600">3.</span>
-              <span>Choose to make it public or private, then save</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

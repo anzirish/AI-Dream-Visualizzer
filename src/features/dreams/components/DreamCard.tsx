@@ -169,15 +169,8 @@ const DreamCard: React.FC<DreamCardProps> = ({ dream, showDelete = false, onDele
                 {dream.generatedStory}
               </p>
             </div>
-            
-            {/* Read More Indicator (appears on hover) */}
-            <div className="absolute bottom-2 right-2 sm:right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <span className="text-xs text-blue-600 font-medium">Read more →</span>
-            </div>
           </div>
         </div>
-
-
       </div>
     </Link>
   );
