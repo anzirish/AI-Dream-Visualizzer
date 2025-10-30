@@ -88,26 +88,13 @@ export const dreamService = {
     await backendAPI.deleteDream(id);
   },
 
-  // Generate AI story
-  async generateStory(title: string, description: string): Promise<string> {
-    return await backendAPI.generateStory(title, description);
-  },
+  // Individual AI generation methods removed - use generateCompleteDream instead
 
-  // Generate AI image
-  async generateImage(description: string): Promise<string> {
-    return await backendAPI.generateImage(description);
-  },
-
-  // Generate complete dream (story + optional image)
+  // Generate complete dream (story + image with fallback)
   async generateCompleteDream(
     title: string,
-    description: string,
-    includeImage = false
+    description: string
   ): Promise<{ story: string; image?: string }> {
-    return await backendAPI.generateCompleteDream(
-      title,
-      description,
-      includeImage
-    );
+    return await backendAPI.generateCompleteDream(title, description);
   },
 };

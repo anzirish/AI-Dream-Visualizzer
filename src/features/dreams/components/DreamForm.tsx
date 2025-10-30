@@ -1,8 +1,8 @@
-import { generateDreamStory, generateDreamImage } from "../services/openrouter";
+import { dreamService } from "../services/dreamService";
 import type { DreamFormData } from "../types/dream";
 import { useState } from "react";
 import { Sparkles, Wand2, FileText, AlertCircle } from "lucide-react";
-import ApiQuotaModal from "./ApiQuotaModal";
+
 
 /**
  * DreamForm Component
@@ -42,9 +42,7 @@ const DreamForm: React.FC<DreamFormProps> = ({ onStoryGenerated }) => {
   /** Error messages for form validation and generation failures */
   const [error, setError] = useState('');
   
-  /** API quota modal state */
-  const [showQuotaModal, setShowQuotaModal] = useState(false);
-  const [quotaApiType, setQuotaApiType] = useState<'text' | 'image'>('text');
+
 
   /**
    * Handles input field changes and clears errors
@@ -81,15 +79,15 @@ const DreamForm: React.FC<DreamFormProps> = ({ onStoryGenerated }) => {
     setGenerationStep('story');
 
     try {
-      // Step 1: Generate story content using AI
-      const story = await generateDreamStory(formData.title, formData.description);
+      // Generate both story and image in a single API call
+      setGenerationStep('story');
+      const result = await dreamService.generateCompleteDream(formData.title, formData.description);
       
-      // Step 2: Generate accompanying image
+      // Update to image step for UI feedback
       setGenerationStep('image');
-      const image = await generateDreamImage(formData.description);
       
       // Pass generated content to parent component
-      onStoryGenerated(story, formData, image);
+      onStoryGenerated(result.story, formData, result.image || '');
       
       // Reset form to initial state
       setFormData({ title: '', description: '' });
@@ -97,14 +95,8 @@ const DreamForm: React.FC<DreamFormProps> = ({ onStoryGenerated }) => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      // Check if it's a quota exceeded error
-      if (error.message?.includes('quota') || error.message?.includes('limit') || error.message?.includes('429')) {
-        setQuotaApiType(generationStep === 'story' ? 'text' : 'image');
-        setShowQuotaModal(true);
-      } else {
-        // Handle other generation errors with user-friendly messages
-        setError(error.message || 'Failed to generate story or image');
-      }
+      // Handle generation errors with user-friendly messages
+      setError(error.message || 'Failed to generate story or image');
       setGenerationStep('idle');
     } finally {
       // Always reset loading state
@@ -203,17 +195,17 @@ const DreamForm: React.FC<DreamFormProps> = ({ onStoryGenerated }) => {
                 <div className="flex-1">
                   {/* Dynamic status message based on current step */}
                   <p className="text-sm font-semibold text-gray-800">
-                    {generationStep === 'story' ? 'Crafting your dream story...' : 'Generating dream image...'}
+                    {generationStep === 'story' ? 'Crafting your dream story...' : 'Finalizing dream content...'}
                   </p>
                   <p className="text-xs text-gray-600 mt-0.5">
-                    {generationStep === 'story' ? 'AI is weaving your narrative' : 'AI is painting your vision'}
+                    {generationStep === 'story' ? 'AI is weaving your narrative and creating visuals' : 'Putting finishing touches on your dream'}
                   </p>
                 </div>
               </div>
               {/* Progress bar showing completion status */}
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div className={`h-full bg-blue-600 rounded-full transition-all duration-1000 ${
-                  generationStep === 'story' ? 'w-1/2' : 'w-full'
+                  generationStep === 'story' ? 'w-3/4' : 'w-full'
                 }`} />
               </div>
             </div>
@@ -254,12 +246,7 @@ const DreamForm: React.FC<DreamFormProps> = ({ onStoryGenerated }) => {
           </div>
         </form>
 
-        {/* API Quota Modal */}
-        <ApiQuotaModal
-          isOpen={showQuotaModal}
-          onClose={() => setShowQuotaModal(false)}
-          apiType={quotaApiType}
-        />
+
     </div>
   );
 };
