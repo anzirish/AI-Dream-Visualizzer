@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/features/auth";
-import { Menu, X, LogOut, Home, PlusCircle, Moon, Settings } from "lucide-react";
+import {
+  Menu,
+  X,
+  LogOut,
+  Home,
+  PlusCircle,
+  Moon,
+  Settings,
+} from "lucide-react";
 
 /**
  * NavBar Component
@@ -61,7 +69,12 @@ const NavBar: React.FC = () => {
             <Link to="/" className="flex items-center space-x-3">
               <div className="bg-blue-600 p-2 rounded-lg">
                 {/* Dream/lightbulb icon SVG */}
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -79,7 +92,9 @@ const NavBar: React.FC = () => {
                 <Link
                   to="/"
                   className={`flex items-center space-x-2 px-3 py-2 rounded-lg font-medium transition-colors ${
-                    isActive("/") ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    isActive("/")
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
                 >
                   <Home className="w-4 h-4" />
@@ -130,7 +145,25 @@ const NavBar: React.FC = () => {
             {loading ? (
               /* Loading state during authentication check */
               <div className="flex items-center space-x-2">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <svg
+                  className="animate-spin h-6 w-6 text-blue-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
                 <span className="text-sm text-gray-600">Loading...</span>
               </div>
             ) : user ? (
@@ -142,7 +175,9 @@ const NavBar: React.FC = () => {
                   <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{user.name}</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    {user.name}
+                  </span>
                 </div>
                 {/* Logout button */}
                 <button
@@ -176,7 +211,25 @@ const NavBar: React.FC = () => {
           <div className="md:hidden flex items-center space-x-2">
             {loading ? (
               /* Loading spinner for mobile */
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <svg
+                className="animate-spin h-6 w-6 text-blue-600"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
             ) : (
               /* Hamburger menu button */
               <button
@@ -184,7 +237,11 @@ const NavBar: React.FC = () => {
                 className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
               >
                 {/* Toggle between hamburger and X icon */}
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {mobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
               </button>
             )}
           </div>
@@ -203,7 +260,9 @@ const NavBar: React.FC = () => {
                   <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{user.name}</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    {user.name}
+                  </span>
                 </div>
 
                 {/* Mobile navigation links */}
@@ -211,7 +270,9 @@ const NavBar: React.FC = () => {
                   to="/"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all ${
-                    isActive("/") ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"
+                    isActive("/")
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-50"
                   }`}
                 >
                   <Home className="w-5 h-5" />
@@ -221,7 +282,9 @@ const NavBar: React.FC = () => {
                   to="/create-dream"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all ${
-                    isActive("/create-dream") ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"
+                    isActive("/create-dream")
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-50"
                   }`}
                 >
                   <PlusCircle className="w-5 h-5" />
@@ -231,7 +294,9 @@ const NavBar: React.FC = () => {
                   to="/my-dreams"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all ${
-                    isActive("/my-dreams") ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"
+                    isActive("/my-dreams")
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-50"
                   }`}
                 >
                   <Moon className="w-5 h-5" />
@@ -241,7 +306,9 @@ const NavBar: React.FC = () => {
                   to="/api-settings"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all ${
-                    isActive("/api-settings") ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"
+                    isActive("/api-settings")
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-50"
                   }`}
                 >
                   <Settings className="w-5 h-5" />
@@ -261,13 +328,21 @@ const NavBar: React.FC = () => {
               /* Unauthenticated user mobile menu */
               <div className="space-y-3">
                 {/* Mobile login button */}
-                <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block">
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block"
+                >
                   <button className="w-full px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all">
                     Login
                   </button>
                 </Link>
                 {/* Mobile sign up button */}
-                <Link to="/signup" onClick={() => setMobileMenuOpen(false)} className="block">
+                <Link
+                  to="/signup"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block"
+                >
                   <button className="w-full px-4 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all shadow-md">
                     Sign Up
                   </button>
