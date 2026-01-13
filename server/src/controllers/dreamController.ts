@@ -5,19 +5,6 @@ import { AuthenticatedRequest } from "../middleware/auth";
 
 /**
  * Create New Dream Handler
- *
- * Creates a new dream entry with AI-generated content and user metadata.
- * Validates required fields and associates dream with authenticated user.
- *
- * @route POST /api/v1/dreams
- * @access Private (requires authentication)
- *
- * @param req - Authenticated request with dream data
- * @param res - Express response object
- * @param next - Express next function for error handling
- *
- * @throws {ApiError} 401 - When user is not authenticated
- * @throws {ApiError} 400 - When required fields are missing
  */
 export const createDream = async (
   req: AuthenticatedRequest,
@@ -78,7 +65,6 @@ export const createDream = async (
 
 /**
  * Get user's dreams
- * GET /api/v1/dreams/my
  */
 export const getMyDreams = async (
   req: AuthenticatedRequest,
@@ -120,7 +106,6 @@ export const getMyDreams = async (
 
 /**
  * Get public dreams feed
- * GET /api/v1/dreams/public
  */
 export const getPublicDreams = async (
   req: AuthenticatedRequest,
@@ -169,7 +154,6 @@ export const getPublicDreams = async (
 
 /**
  * Get single dream by ID
- * GET /api/v1/dreams/:id
  */
 export const getDreamById = async (
   req: AuthenticatedRequest,
@@ -213,7 +197,6 @@ export const getDreamById = async (
 
 /**
  * Update dream
- * PUT /api/v1/dreams/:id
  */
 export const updateDream = async (
   req: AuthenticatedRequest,
@@ -270,7 +253,6 @@ export const updateDream = async (
 
 /**
  * Delete dream
- * DELETE /api/v1/dreams/:id
  */
 export const deleteDream = async (
   req: AuthenticatedRequest,

@@ -3,69 +3,54 @@ import { verifyToken, extractTokenFromHeader, JWTPayload } from "../utils/jwt";
 import { ApiError } from "./errorHandler";
 import User from "../models/User";
 
-// Extended Request Interface - Extends Express Request to include authenticated user information
 export interface AuthenticatedRequest extends Request {
-  // Authenticated user information (present when user is logged in)
   user?: {
-    // User's unique identifier
     userId: string;
-    // User's email address
     email: string;
-    // User's display name (cached for performance)
     name?: string;
   };
 }
 
-// Required Authentication Middleware - Verifies JWT token and attaches user data to request object
 export const authenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    // Extract JWT token from Authorization header (Bearer token format)
     const token = extractTokenFromHeader(req.headers.authorization);
 
     if (!token) {
       throw new ApiError(401, "Access token is required");
     }
 
-    // Verify token signature and decode payload
     const payload: JWTPayload = verifyToken(token);
 
-    // Verify user still exists in database (handles deleted accounts)
     const user = await User.findById(payload.userId);
     if (!user) {
       throw new ApiError(401, "User no longer exists");
     }
 
-    // Attach authenticated user data to request for use in route handlers
     req.user = {
       userId: payload.userId,
       email: payload.email,
-      name: user.name, // Cache name to avoid additional DB queries
+      name: user.name,
     };
 
-    next(); // Continue to next middleware/route handler
+    next();
   } catch (error) {
-    // Handle authentication errors appropriately
     if (error instanceof ApiError) {
-      next(error); // Pass through custom API errors
+      next(error);
     } else {
-      next(new ApiError(401, "Invalid or expired token")); // Generic auth failure
+      next(new ApiError(401, "Invalid or expired token"));
     }
   }
 };
 
-// Optional Authentication Middleware - Attaches user data to request if valid token is present
 export const optionalAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    // Attempt to extract token from Authorization header
     const token = extractTokenFromHeader(req.headers.authorization);
 
     if (token) {
-      // If token exists, try to verify and attach user data
       const payload: JWTPayload = verifyToken(token);
       const user = await User.findById(payload.userId);
 
       if (user) {
-        // Attach user data if token is valid and user exists
         req.user = {
           userId: payload.userId,
           email: payload.email,
@@ -74,12 +59,9 @@ export const optionalAuth = async (req: AuthenticatedRequest, res: Response, nex
       }
     }
 
-    // Always continue to next middleware, regardless of auth status
     next();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    // Silently ignore authentication errors for optional auth
-    // This allows the request to proceed without user context
     next();
   }
 };

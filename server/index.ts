@@ -9,7 +9,6 @@ import { rateLimiter } from "./src/middleware/rateLimiter";
 
 // Import routes
 import v1Routes from "./src/routes/v1";
-import analyticsRoutes from "./src/routes/analytics";
 import { apiDocumentation } from "./src/config/apiDocs";
 
 // Load environment variables from .env file
@@ -62,10 +61,7 @@ app.get("/health", (req, res) => {
 });
 
 // API Route Configuration
-// - /api/v1: Main API endpoints (auth, dreams, AI generation, etc.)
-// - /api/analytics: Analytics and statistics endpoints
 app.use("/api/v1", v1Routes);
-app.use("/api/analytics", analyticsRoutes);
 
 // API Documentation Endpoint - GET /api
 // Returns comprehensive API documentation including all available endpoints
@@ -94,7 +90,6 @@ app.listen(PORT, () => {
   console.log(`🚀 AI Dreams API Server running on port ${PORT}`);
   console.log(`📊 Environment: development`);
   console.log(`🔗 API v1: http://localhost:${PORT}/api/v1`);
-  console.log(`📈 Analytics: http://localhost:${PORT}/api/analytics`);
   console.log(`📚 Documentation: http://localhost:${PORT}/api`);
   console.log(`🏥 Health Check: http://localhost:${PORT}/health`);
 });

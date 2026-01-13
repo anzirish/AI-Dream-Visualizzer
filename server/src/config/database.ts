@@ -16,9 +16,6 @@ export const connectDB = async (): Promise<void> => {
     const conn = await mongoose.connect(mongoURI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
 
-    // MongoDB Connection Event Handlers
-    // These event listeners handle various connection states and provide appropriate logging
-
     // Handle connection errors after initial connection
     mongoose.connection.on("error", (err) => {
       console.error("MongoDB connection error:", err);
@@ -29,7 +26,6 @@ export const connectDB = async (): Promise<void> => {
       console.log("MongoDB disconnected");
     });
   } catch (error) {
-    // Connection Error Handling
     // If MongoDB connection fails, log the error but allow the server to continue running
     console.error("Error connecting to MongoDB:", error);
     console.log("Server will continue without database connection");

@@ -28,13 +28,7 @@ export const apiDocumentation = {
       ],
       ai: ["POST /api/v1/ai/generate-story", "POST /api/v1/ai/generate-image", "POST /api/v1/ai/generate-complete"],
     },
-    analytics: [
-      "GET /api/analytics/overview",
-      "GET /api/analytics/user/stats",
-      "GET /api/analytics/trends",
-      "GET /api/analytics/health",
-    ],
-    health: ["GET /health", "GET /api/v1/health", "GET /api/analytics/health"],
+    health: ["GET /health", "GET /api/v1/health"],
   },
   documentation: "Visit /api for endpoint documentation",
 };

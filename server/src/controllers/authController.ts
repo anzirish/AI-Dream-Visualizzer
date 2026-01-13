@@ -5,18 +5,6 @@ import { ApiError } from "../middleware/errorHandler";
 
 /**
  * User Registration Handler
- *
- * Creates a new user account with email and password authentication.
- * Validates input data, checks for existing users, and generates JWT token.
- *
- * @route POST /api/v1/auth/signup
- * @access Public
- *
- * @param req - Express request object containing user registration data
- * @param res - Express response object
- * @param next - Express next function for error handling
- *
- * @throws {ApiError} 400 - When required fields are missing or user exists
  */
 export const signup = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -65,7 +53,6 @@ export const signup = async (req: Request, res: Response, next: NextFunction): P
 
 /**
  * Login user
- * POST /api/v1/auth/login
  */
 export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -111,7 +98,6 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 
 /**
  * Get current user profile
- * GET /api/v1/auth/me
  */
 export const getMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -145,7 +131,6 @@ export const getMe = async (req: Request, res: Response, next: NextFunction): Pr
 
 /**
  * Logout user (client-side token removal)
- * POST /api/v1/auth/logout
  */
 export const logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
