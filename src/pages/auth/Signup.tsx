@@ -4,19 +4,6 @@ import { SignUpForm, useAuth } from '@/features/auth';
 
 /**
  * Signup Page Component
- *
- * User registration page with automatic redirect handling for authenticated users.
- * Provides a centered signup form with branding and visual appeal.
- *
- * Features:
- * - Automatic redirect for already authenticated users
- * - Loading state during authentication check
- * - Centered layout with branded design
- * - Integration with SignUpForm component
- * - Responsive design for all screen sizes
- * - Backdrop blur effect for modern appearance
- * - Dream-themed branding and messaging
- * - Consistent styling with Login page
  */
 const Signup: React.FC = () => {
   // Authentication state and navigation

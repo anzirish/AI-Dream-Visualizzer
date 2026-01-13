@@ -1,15 +1,5 @@
 /**
  * Validation Utilities
- *
- * Shared validation functions for form inputs across the application.
- * Provides consistent validation logic and error messages.
- */
-
-/**
- * Validates email address format and presence
- * 
- * @param email - Email address to validate
- * @returns {string | null} - Error message if invalid, null if valid
  */
 export const validateEmail = (email: string): string | null => {
   // RFC 5322 compliant email regex pattern

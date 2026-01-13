@@ -4,18 +4,6 @@ import { LoginForm, useAuth } from '@/features/auth';
 
 /**
  * Login Page Component
- *
- * Authentication page for user login with automatic redirect handling.
- * Provides a centered login form with branding and visual appeal.
- *
- * Features:
- * - Automatic redirect for already authenticated users
- * - Loading state during authentication check
- * - Centered layout with branded design
- * - Integration with LoginForm component
- * - Responsive design for all screen sizes
- * - Backdrop blur effect for modern appearance
- * - Dream-themed branding and messaging
  */
 const Login: React.FC = () => {
   // Authentication state and navigation

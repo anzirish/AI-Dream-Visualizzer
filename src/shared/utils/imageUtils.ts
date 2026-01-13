@@ -2,14 +2,6 @@
  * Image utility functions for processing and compression
  */
 
-/**
- * Compresses a base64 image to reduce file size for storage
- * 
- * @param base64 - Base64 encoded image string
- * @param maxWidth - Maximum width for the compressed image
- * @param quality - JPEG compression quality (0-1)
- * @returns Promise resolving to compressed base64 string
- */
 export const compressBase64Image = async (
   base64: string,
   maxWidth = 512,

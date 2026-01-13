@@ -12,17 +12,6 @@ import { NavBar } from "@/shared/components/layout";
 
 /**
  * App Component - Root Application Component
- *
- * Main application component that sets up routing, authentication context,
- * and the overall application structure for the AI Dreams app.
- *
- * Features:
- * - React Router for client-side routing
- * - Authentication context provider for global auth state
- * - Protected routes for authenticated-only pages
- * - Public routes accessible to all users
- * - Persistent navigation bar across all pages
- * - Responsive layout with minimum height viewport
  */
 function App() {
   return (
