@@ -4,20 +4,15 @@ import { dreamService } from '@/features/dreams/services/dreamService';
 import { Calendar, User, Sparkles, ArrowLeft, Eye } from 'lucide-react';
 import type { Dream } from '@/features/dreams/types/dream';
 
-// DreamDetail Page Component - Full-page view for displaying a single dream with all its details
+// DreamDetail Page Component
 const DreamDetail: React.FC = () => {
+
   // URL parameters and navigation
   const { dreamId } = useParams<{ dreamId: string }>();
   const navigate = useNavigate();
   
-  // Component state management
-  // The dream data being displayed
   const [dream, setDream] = useState<Dream | null>(null);
-  
-  // Loading state during data fetch
   const [loading, setLoading] = useState(true);
-  
-  // Error message if dream fetch fails
   const [error, setError] = useState<string | null>(null);
 
   // Fetch dream data when component mounts or dreamId changes

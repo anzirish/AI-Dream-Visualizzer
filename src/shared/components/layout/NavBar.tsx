@@ -8,7 +8,6 @@ import {
   Home,
   PlusCircle,
   Moon,
-  Settings,
 } from "lucide-react";
 
 // Main navigation component with responsive design and authentication-aware menu items
@@ -95,18 +94,6 @@ const NavBar: React.FC = () => {
                 >
                   <Moon className="w-4 h-4" />
                   <span>My Dreams</span>
-                </Link>
-                {/* API Settings link */}
-                <Link
-                  to="/api-settings"
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg font-medium transition-colors ${
-                    isActive("/api-settings")
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
-                >
-                  <Settings className="w-4 h-4" />
-                  <span>API Settings</span>
                 </Link>
               </div>
             )}
@@ -273,18 +260,6 @@ const NavBar: React.FC = () => {
                 >
                   <Moon className="w-5 h-5" />
                   <span>My Dreams</span>
-                </Link>
-                <Link
-                  to="/api-settings"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all ${
-                    isActive("/api-settings")
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-600 hover:bg-gray-50"
-                  }`}
-                >
-                  <Settings className="w-5 h-5" />
-                  <span>API Settings</span>
                 </Link>
 
                 {/* Mobile logout button */}

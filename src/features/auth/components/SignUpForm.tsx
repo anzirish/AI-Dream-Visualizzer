@@ -1,75 +1,47 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import type { SignupFormData } from "../types/auth";
-import {
-  validateEmail,
-  validatePassword,
-  validateName,
-  validateConfirmPassword,
-} from "@/shared/utils/validation";
 
-// Signup form component
+// Simplified signup form component
 const SignupForm: React.FC = () => {
   const { signup } = useAuth();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState<SignupFormData>({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  const [errors, setErrors] = useState<Partial<SignupFormData>>({});
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [authError, setAuthError] = useState("");
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    
-    if (errors[name as keyof SignupFormData]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-    if (authError) setAuthError("");
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: Partial<SignupFormData> = {};
-
-    const nameError = validateName(formData.name);
-    if (nameError) newErrors.name = nameError;
-
-    const emailError = validateEmail(formData.email);
-    if (emailError) newErrors.email = emailError;
-
-    const passwordError = validatePassword(formData.password);
-    if (passwordError) newErrors.password = passwordError;
-
-    const confirmPasswordError = validateConfirmPassword(
-      formData.password,
-      formData.confirmPassword
-    );
-    if (confirmPasswordError) newErrors.confirmPassword = confirmPasswordError;
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    
+    // Basic validation
+    if (!name || !email || !password || !confirmPassword) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
 
     setIsLoading(true);
-    setAuthError("");
+    setError("");
 
     try {
-      await signup(formData.email, formData.password, formData.name);
+      await signup(email, password, name);
       navigate("/");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      setAuthError(error.message || "Account creation failed. Please try again.");
+    } catch (err: any) {
+      setError(err.message || "Account creation failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -81,41 +53,31 @@ const SignupForm: React.FC = () => {
         {/* Name Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Full Name
+            Name
           </label>
           <input
             type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
-            className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.name ? "border-red-500" : "border-gray-300"
-            }`}
+            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
-          {errors.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-          )}
         </div>
 
         {/* Email Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email Address
+            Email
           </label>
           <input
             type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="your@email.com"
-            className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.email ? "border-red-500" : "border-gray-300"
-            }`}
+            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-          )}
         </div>
 
         {/* Password Field */}
@@ -125,17 +87,12 @@ const SignupForm: React.FC = () => {
           </label>
           <input
             type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="Create password"
-            className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.password ? "border-red-500" : "border-gray-300"
-            }`}
+            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
-          {errors.password && (
-            <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-          )}
         </div>
 
         {/* Confirm Password Field */}
@@ -145,23 +102,18 @@ const SignupForm: React.FC = () => {
           </label>
           <input
             type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Confirm password"
-            className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.confirmPassword ? "border-red-500" : "border-gray-300"
-            }`}
+            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
-          {errors.confirmPassword && (
-            <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
-          )}
         </div>
 
-        {/* Auth Error */}
-        {authError && (
+        {/* Error Message */}
+        {error && (
           <div className="p-3 bg-red-50 border border-red-200 rounded">
-            <p className="text-red-700 text-sm">{authError}</p>
+            <p className="text-red-700 text-sm">{error}</p>
           </div>
         )}
 

@@ -4,17 +4,14 @@ import type { DreamFormData } from '@/features/dreams';
 
 // CreateDream Page Component - Main page for creating new dream stories using AI generation
 const CreateDream: React.FC = () => {
-  // State management for the dream creation workflow
-  // AI-generated story content, null when not yet generated
+
   const [generatedStory, setGeneratedStory] = useState<string | null>(null);
   
-  // AI-generated image URL
   const [generatedImage, setGeneratedImage] = useState<string>('');
   
   // Original form data from user input
   const [dreamData, setDreamData] = useState<DreamFormData | null>(null);
 
-  // Handles successful story generation from DreamForm
   // Transitions from form view to story display view
   const handleStoryGenerated = (story: string, formData: DreamFormData, image: string) => {
     setGeneratedStory(story);
@@ -23,7 +20,6 @@ const CreateDream: React.FC = () => {
   };
 
   // Resets the creation workflow back to the initial form state
-  // Allows users to start over with a new dream
   const handleReset = () => {
     setGeneratedStory(null);
     setGeneratedImage('');

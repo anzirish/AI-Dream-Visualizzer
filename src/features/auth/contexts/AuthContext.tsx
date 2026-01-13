@@ -1,5 +1,11 @@
 import React, { createContext, useEffect, useState } from "react";
-import { backendAPI } from "@/services/api/backend";
+import { 
+  signup as apiSignup,
+  login as apiLogin,
+  logout as apiLogout,
+  getCurrentUser,
+  isAuthenticated
+} from "@/services/api/backend";
 import type { User, AuthContextType } from "../types/auth";
 
 // Create authentication context with undefined default
@@ -29,8 +35,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     // Validates existing authentication token and user session
     const checkAuth = async () => {
       try {
-        if (backendAPI.isAuthenticated()) {
-          const currentUser = await backendAPI.getCurrentUser();
+        if (isAuthenticated()) {
+          const currentUser = await getCurrentUser();
           if (currentUser) {
             setUser(currentUser);
             localStorage.setItem("dreamapp_user", JSON.stringify(currentUser));
@@ -56,21 +62,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Creates a new user account and logs them in
   const signup = async (email: string, password: string, name: string) => {
-    const newUser = await backendAPI.signup(name, email, password);
+    const newUser = await apiSignup(name, email, password);
     setUser(newUser);
     localStorage.setItem("dreamapp_user", JSON.stringify(newUser));
   };
 
   // Authenticates existing user with email and password
   const login = async (email: string, password: string) => {
-    const loggedInUser = await backendAPI.login(email, password);
+    const loggedInUser = await apiLogin(email, password);
     setUser(loggedInUser);
     localStorage.setItem("dreamapp_user", JSON.stringify(loggedInUser));
   };
 
   // Logs out the current user and clears all authentication data
   const logout = async () => {
-    await backendAPI.logout();
+    await apiLogout();
     setUser(null);
     localStorage.removeItem("dreamapp_user");
   };

@@ -2,7 +2,16 @@
  * Dream service for handling dream-related API calls
  */
 
-import { backendAPI, type Dream as BackendDream } from "@/services/api/backend";
+import { 
+  createDream,
+  getMyDreams,
+  getPublicDreams,
+  getDreamById,
+  updateDream,
+  deleteDream,
+  generateCompleteDream,
+  type Dream as BackendDream 
+} from "@/services/api/backend";
 import type { Dream, DreamFormData } from "../types/dream";
 
 // Convert backend dream format to frontend dream format
@@ -26,7 +35,7 @@ export const dreamService = {
       throw new Error("Generated story is required to create a dream");
     }
 
-    const backendDream = await backendAPI.createDream({
+    const backendDream = await createDream({
       title: dreamData.title,
       description: dreamData.description,
       generatedStory: dreamData.generatedStory,
@@ -39,7 +48,7 @@ export const dreamService = {
 
   // Get user's dreams
   async getMyDreams(): Promise<Dream[]> {
-    const backendDreams = await backendAPI.getMyDreams();
+    const backendDreams = await getMyDreams();
     return backendDreams.map(convertBackendDream);
   },
 
@@ -47,26 +56,14 @@ export const dreamService = {
   async getPublicDreams(
     page = 1,
     limit = 20
-  ): Promise<{
-    dreams: Dream[];
-    pagination: {
-      currentPage: number;
-      totalPages: number;
-      totalCount: number;
-      hasNext: boolean;
-      hasPrev: boolean;
-    };
-  }> {
-    const result = await backendAPI.getPublicDreams(page, limit);
-    return {
-      dreams: result.dreams.map(convertBackendDream),
-      pagination: result.pagination,
-    };
+  ): Promise<Dream[]> {
+    const result = await getPublicDreams(page, limit);
+    return result.dreams.map(convertBackendDream);
   },
 
   // Get dream by ID
   async getDreamById(id: string): Promise<Dream> {
-    const backendDream = await backendAPI.getDreamById(id);
+    const backendDream = await getDreamById(id);
     return convertBackendDream(backendDream);
   },
 
@@ -79,22 +76,20 @@ export const dreamService = {
       isPublic?: boolean;
     }
   ): Promise<Dream> {
-    const backendDream = await backendAPI.updateDream(id, updates);
+    const backendDream = await updateDream(id, updates);
     return convertBackendDream(backendDream);
   },
 
   // Delete dream
   async deleteDream(id: string): Promise<void> {
-    await backendAPI.deleteDream(id);
+    await deleteDream(id);
   },
-
-  // Individual AI generation methods removed - use generateCompleteDream instead
 
   // Generate complete dream (story + image with fallback)
   async generateCompleteDream(
     title: string,
     description: string
   ): Promise<{ story: string; image?: string }> {
-    return await backendAPI.generateCompleteDream(title, description);
+    return await generateCompleteDream(title, description);
   },
 };

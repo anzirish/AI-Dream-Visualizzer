@@ -1,59 +1,35 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import type { LoginFormData } from "../types/auth";
-import { validateEmail, validatePassword } from "@/shared/utils/validation";
 
-// Login form component
+// Simplified login form component
 const LoginForm: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState<LoginFormData>({
-    email: "",
-    password: "",
-  });
-
-  const [errors, setErrors] = useState<Partial<LoginFormData>>({});
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [authError, setAuthError] = useState("");
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    
-    if (errors[name as keyof LoginFormData]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-    if (authError) setAuthError("");
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: Partial<LoginFormData> = {};
-
-    const emailError = validateEmail(formData.email);
-    if (emailError) newErrors.email = emailError;
-
-    const passwordError = validatePassword(formData.password);
-    if (passwordError) newErrors.password = passwordError;
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    
+    // Basic validation
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
 
     setIsLoading(true);
-    setAuthError("");
+    setError("");
 
     try {
-      await login(formData.email, formData.password);
+      await login(email, password);
       navigate("/");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      setAuthError(error.message || "Login failed. Please try again.");
+    } catch (err: any) {
+      setError(err.message || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -65,21 +41,16 @@ const LoginForm: React.FC = () => {
         {/* Email Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email Address
+            Email
           </label>
           <input
             type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="your@email.com"
-            className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.email ? "border-red-500" : "border-gray-300"
-            }`}
+            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-          )}
         </div>
 
         {/* Password Field */}
@@ -89,23 +60,18 @@ const LoginForm: React.FC = () => {
           </label>
           <input
             type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
-            className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.password ? "border-red-500" : "border-gray-300"
-            }`}
+            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
-          {errors.password && (
-            <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-          )}
         </div>
 
-        {/* Auth Error */}
-        {authError && (
+        {/* Error Message */}
+        {error && (
           <div className="p-3 bg-red-50 border border-red-200 rounded">
-            <p className="text-red-700 text-sm">{authError}</p>
+            <p className="text-red-700 text-sm">{error}</p>
           </div>
         )}
 

@@ -1,15 +1,8 @@
 /**
- * Backend API service for AI Dreams
+ * Simplified Backend API service for AI Dreams - Function-based
  */
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
-
-interface ApiResponse<T = unknown> {
-  success: boolean;
-  message?: string;
-  data?: T;
-}
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
 
 interface User {
   uid: string;
@@ -30,202 +23,158 @@ interface Dream {
   createdAt: string;
 }
 
-interface Pagination {
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-}
+// Token management
+const getToken = (): string | null => {
+  return localStorage.getItem("authToken");
+};
 
-class BackendAPI {
-  private token: string | null = null;
+const setToken = (token: string): void => {
+  localStorage.setItem("authToken", token);
+};
 
-  constructor() {
-    // Load token from localStorage on initialization
-    this.token = localStorage.getItem("authToken");
+const clearToken = (): void => {
+  localStorage.removeItem("authToken");
+};
+
+// HTTP request helper
+const request = async (endpoint: string, options: RequestInit = {}) => {
+  const token = getToken();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
   }
 
-  // Record<K, V> is a TypeScript utility type that creates an object type where:
-  // K = the type of the keys
-  // V = the type of the values
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers: { ...headers, ...options.headers },
+  });
 
-  private getHeaders(): Record<string, string> {
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-
-    if (this.token) {
-      headers.Authorization = `Bearer ${this.token}`;
-    }
-
-    return headers;
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
   }
 
-  // RequestInit is the built-in TypeScript type for the options object 
-  // that you pass to the fetch() function. It defines all the possible 
-  // configuration options for an HTTP request.
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers: { ...this.getHeaders(), ...options.headers },
-    });
+  return response.json();
+};
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `HTTP error! status: ${response.status}`
-      );
-    }
+// Authentication functions
+export const signup = async (name: string, email: string, password: string): Promise<User> => {
+  const response = await request("/auth/signup", {
+    method: "POST",
+    body: JSON.stringify({ name, email, password }),
+  });
 
-    return response.json();
+  if (response.data.token) {
+    setToken(response.data.token);
   }
+  return response.data.user;
+};
 
-  // Authentication methods
-  async signup(name: string, email: string, password: string): Promise<User> {
-    const response = await this.request<
-      ApiResponse<{ user: User; token: string }>
-    >("/auth/signup", {
-      method: "POST",
-      body: JSON.stringify({ name, email, password }),
-    });
+export const login = async (email: string, password: string): Promise<User> => {
+  const response = await request("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
 
-    this.token = response.data!.token;
-    localStorage.setItem("authToken", this.token);
-    return response.data!.user;
+  if (response.data.token) {
+    setToken(response.data.token);
   }
+  return response.data.user;
+};
 
-  async login(email: string, password: string): Promise<User> {
-    const response = await this.request<
-      ApiResponse<{ user: User; token: string }>
-    >("/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
-
-    this.token = response.data!.token;
-    localStorage.setItem("authToken", this.token);
-    return response.data!.user;
+export const logout = async (): Promise<void> => {
+  try {
+    await request("/auth/logout", { method: "POST" });
+  } finally {
+    clearToken();
   }
+};
 
-  async logout(): Promise<void> {
-    try {
-      await this.request("/auth/logout", { method: "POST" });
-    } finally {
-      this.token = null;
-      localStorage.removeItem("authToken");
-    }
+export const getCurrentUser = async (): Promise<User | null> => {
+  const token = getToken();
+  if (!token) return null;
+
+  try {
+    const response = await request("/auth/me");
+    return response.data?.user || null;
+  } catch {
+    clearToken();
+    return null;
   }
+};
 
-  async getCurrentUser(): Promise<User | null> {
-    if (!this.token) return null;
+// Dream functions
+export const createDream = async (dreamData: {
+  title: string;
+  description: string;
+  generatedStory: string;
+  generatedImage?: string;
+  isPublic?: boolean;
+}): Promise<Dream> => {
+  const response = await request("/dreams", {
+    method: "POST",
+    body: JSON.stringify(dreamData),
+  });
+  return response.data.dream;
+};
 
-    try {
-      const response = await this.request<ApiResponse<{ user: User }>>(
-        "/auth/me"
-      );
-      return response.data?.user || null;
-    } catch {
-      this.token = null;
-      localStorage.removeItem("authToken");
-      return null;
-    }
-  }
+export const getMyDreams = async (): Promise<Dream[]> => {
+  const response = await request("/dreams/my");
+  return response.data?.dreams || [];
+};
 
-  // Dream methods
-  async createDream(dreamData: {
-    title: string;
-    description: string;
-    generatedStory: string;
-    generatedImage?: string;
-    isPublic?: boolean;
-  }): Promise<Dream> {
-    const response = await this.request<ApiResponse<{ dream: Dream }>>(
-      "/dreams",
-      { method: "POST", body: JSON.stringify(dreamData) }
-    );
-    return response.data!.dream;
-  }
+export const getPublicDreams = async (page = 1, limit = 20): Promise<{ dreams: Dream[] }> => {
+  const response = await request(`/dreams/public?page=${page}&limit=${limit}`);
+  return { dreams: response.data?.dreams || [] };
+};
 
-  async getMyDreams(): Promise<Dream[]> {
-    const response = await this.request<ApiResponse<{ dreams: Dream[] }>>(
-      "/dreams/my"
-    );
-    return response.data?.dreams || [];
-  }
+export const getDreamById = async (id: string): Promise<Dream> => {
+  const response = await request(`/dreams/${id}`);
+  return response.data.dream;
+};
 
-  async getPublicDreams(
-    page = 1,
-    limit = 20
-  ): Promise<{ dreams: Dream[]; pagination: Pagination }> {
-    const response = await this.request<
-      ApiResponse<{ dreams: Dream[]; pagination: Pagination }>
-    >(`/dreams/public?page=${page}&limit=${limit}`);
+export const updateDream = async (
+  id: string,
+  updates: { title?: string; description?: string; isPublic?: boolean }
+): Promise<Dream> => {
+  const response = await request(`/dreams/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(updates),
+  });
+  return response.data.dream;
+};
 
-    return {
-      dreams: response.data?.dreams || [],
-      pagination: response.data?.pagination || {
-        currentPage: 1,
-        totalPages: 1,
-        totalCount: 0,
-        hasNext: false,
-        hasPrev: false,
-      },
-    };
-  }
+export const deleteDream = async (id: string): Promise<void> => {
+  await request(`/dreams/${id}`, { method: "DELETE" });
+};
 
-  async getDreamById(id: string): Promise<Dream> {
-    const response = await this.request<ApiResponse<{ dream: Dream }>>(
-      `/dreams/${id}`
-    );
-    return response.data!.dream;
-  }
+// AI functions
+export const generateCompleteDream = async (
+  title: string,
+  description: string
+): Promise<{ story: string; image?: string }> => {
+  const response = await request("/ai/generate-complete", {
+    method: "POST",
+    body: JSON.stringify({ title, description }),
+  });
 
-  async updateDream(
-    id: string,
-    updates: { title?: string; description?: string; isPublic?: boolean }
-  ): Promise<Dream> {
-    const response = await this.request<ApiResponse<{ dream: Dream }>>(
-      `/dreams/${id}`,
-      { method: "PUT", body: JSON.stringify(updates) }
-    );
-    return response.data!.dream;
-  }
+  return {
+    story: response.data?.story || "",
+    image: response.data?.image,
+  };
+};
 
-  async deleteDream(id: string): Promise<void> {
-    await this.request(`/dreams/${id}`, { method: "DELETE" });
-  }
+// Utility functions
+export const isAuthenticated = (): boolean => {
+  return !!getToken();
+};
 
-  // AI methods
-  async generateCompleteDream(
-    title: string,
-    description: string
-  ): Promise<{ story: string; image?: string }> {
-    const response = await this.request<
-      ApiResponse<{ story: string; image?: string }>
-    >("/ai/generate-complete", {
-      method: "POST",
-      body: JSON.stringify({ title, description }),
-    });
+export const getAuthToken = (): string | null => {
+  return getToken();
+};
 
-    return {
-      story: response.data?.story || "",
-      image: response.data?.image,
-    };
-  }
 
-  // Utility methods
-  isAuthenticated(): boolean {
-    return !!this.token;
-  }
-
-  getToken(): string | null {
-    return this.token;
-  }
-}
-
-export const backendAPI = new BackendAPI();
 export type { User, Dream };
