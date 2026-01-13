@@ -11,52 +11,24 @@ import {
   Settings,
 } from "lucide-react";
 
-/**
- * NavBar Component
- *
- * Main navigation component for the AI Dreams application.
- * Provides responsive navigation with authentication-aware menu items.
- *
- * Features:
- * - Responsive design (desktop and mobile layouts)
- * - Authentication-aware navigation (different menus for logged in/out users)
- * - Active route highlighting
- * - Mobile hamburger menu with smooth transitions
- * - User profile display with avatar
- * - Logout functionality
- * - Loading states during authentication
- * - Sticky positioning for persistent navigation
- */
+// Main navigation component with responsive design and authentication-aware menu items
 const NavBar: React.FC = () => {
-  // Hooks for authentication, navigation, and routing
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
-  /** State for mobile menu visibility */
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  /**
-   * Handles user logout and redirects to login page
-   */
+  // Handles user logout and redirects to login page
   const handleLogout = async () => {
     try {
-      // Perform logout via auth context
       await logout();
-
-      // Redirect to login page after successful logout
       navigate("/login");
     } catch (error) {
       console.error("Failed to logout:", error);
     }
   };
 
-  /**
-   * Determines if a navigation link is currently active
-   *
-   * @param path - The route path to check
-   * @returns {boolean} - True if the current route matches the path
-   */
+  // Determines if a navigation link is currently active
   const isActive = (path: string) => location.pathname === path;
 
   return (
@@ -143,7 +115,7 @@ const NavBar: React.FC = () => {
           {/* Right Side - User Information and Actions (Desktop) */}
           <div className="hidden md:flex items-center space-x-4">
             {loading ? (
-              /* Loading state during authentication check */
+              // Loading state during authentication check
               <div className="flex items-center space-x-2">
                 <svg
                   className="animate-spin h-6 w-6 text-blue-600"
@@ -167,7 +139,7 @@ const NavBar: React.FC = () => {
                 <span className="text-sm text-gray-600">Loading...</span>
               </div>
             ) : user ? (
-              /* Authenticated user section */
+              // Authenticated user section
               <div className="flex items-center space-x-4">
                 {/* User profile display */}
                 <div className="flex items-center space-x-3 px-4 py-2 bg-blue-50 rounded-lg border border-blue-100">
@@ -189,7 +161,7 @@ const NavBar: React.FC = () => {
                 </button>
               </div>
             ) : (
-              /* Unauthenticated user section */
+              // Unauthenticated user section
               <div className="flex items-center space-x-3">
                 {/* Login button */}
                 <Link to="/login">
@@ -210,7 +182,7 @@ const NavBar: React.FC = () => {
           {/* Mobile Menu Toggle Button */}
           <div className="md:hidden flex items-center space-x-2">
             {loading ? (
-              /* Loading spinner for mobile */
+              // Loading spinner for mobile
               <svg
                 className="animate-spin h-6 w-6 text-blue-600"
                 fill="none"
@@ -231,7 +203,7 @@ const NavBar: React.FC = () => {
                 ></path>
               </svg>
             ) : (
-              /* Hamburger menu button */
+              // Hamburger menu button
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
@@ -253,7 +225,7 @@ const NavBar: React.FC = () => {
         <div className="md:hidden border-t border-gray-200 bg-white/95 backdrop-blur-md">
           <div className="px-4 py-4 space-y-3">
             {user ? (
-              /* Authenticated user mobile menu */
+              // Authenticated user mobile menu
               <>
                 {/* User profile section */}
                 <div className="flex items-center space-x-3 px-4 py-3 bg-blue-50 rounded-lg border border-blue-100 mb-4">
@@ -325,7 +297,7 @@ const NavBar: React.FC = () => {
                 </button>
               </>
             ) : (
-              /* Unauthenticated user mobile menu */
+              // Unauthenticated user mobile menu
               <div className="space-y-3">
                 {/* Mobile login button */}
                 <Link

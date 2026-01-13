@@ -1,77 +1,30 @@
 import React, { useState } from "react";
 import type { DreamFormData } from "../types/dream";
 import { useAuth } from "@/features/auth";
-import {
-  Save,
-  Sparkles,
-  Lock,
-  Globe,
-  CheckCircle2,
-  AlertCircle,
-  Image as ImageIcon,
-  BookOpen,
-} from "lucide-react";
 import { dreamService } from "../services/dreamService";
 import { compressBase64Image } from "@/shared/utils";
 
-/**
- * StoryDisplay Component
- *
- * Displays AI-generated dream story and image with save functionality.
- * Provides privacy controls and responsive layout for optimal viewing.
- *
- * Features:
- * - Responsive layout (mobile/desktop optimized)
- * - AI-generated story and image display
- * - Privacy controls (public/private toggle)
- * - Save functionality with loading states
- * - Image compression for optimal storage
- * - Success/error feedback messages
- * - Reset functionality to create new dreams
- * - Authentication-aware save operations
- */
-
 interface StoryDisplayProps {
-  /** AI-generated story content */
   story: string;
-  /** Original dream form data */
   dreamData: DreamFormData;
-  /** AI-generated image (optional) */
   image?: string;
-  /** Callback to reset and create new dream */
   onReset: () => void;
 }
 
+// Component to display generated dream story and image
 const StoryDisplay: React.FC<StoryDisplayProps> = ({
   story,
   dreamData,
   image,
   onReset,
 }) => {
-  // Authentication context
   const { user } = useAuth();
-
-  // Component state management
-  /** Loading state during save operation */
   const [isSaving, setIsSaving] = useState(false);
-
-  /** Success state after successful save */
   const [isSaved, setIsSaved] = useState(false);
-
-  /** Error message for save failures */
   const [error, setError] = useState("");
-
-  /** Privacy setting - whether dream should be public */
   const [isPublic, setIsPublic] = useState(false);
 
-  /** Image loading state for UI feedback */
-  const [imageLoaded, setImageLoaded] = useState(false);
-
-  /**
-   * Handles saving the dream to the backend with compression and privacy settings
-   */
   const handleSave = async () => {
-    // Ensure user is authenticated
     if (!user) {
       setError("You must be logged in to save dreams");
       return;
@@ -81,12 +34,8 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({
     setError("");
 
     try {
-      // Compress image if present to reduce storage size
-      const compressedImage = image
-        ? await compressBase64Image(image, 512, 0.7)
-        : "";
-
-      // Prepare dream data for saving
+      const compressedImage = image ? await compressBase64Image(image, 512, 0.7) : "";
+      
       const dreamToSave = {
         title: dreamData.title,
         description: dreamData.description,
@@ -95,10 +44,9 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({
         isPublic: isPublic,
       };
 
-      // Save dream via service
       await dreamService.createDream(dreamToSave);
       setIsSaved(true);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error saving dream:", error);
       setError(`Failed to save: ${error.message}`);
@@ -107,75 +55,50 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({
     }
   };
 
-  /**
-   * Resets component state and triggers parent reset to create new dream
-   */
   const handleNewDream = () => {
     setIsSaved(false);
     setError("");
     setIsPublic(false);
-    setImageLoaded(false);
     onReset();
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden max-w-6xl mx-auto">
+    <div className="bg-white rounded-lg shadow border max-w-4xl mx-auto">
       {/* Header */}
-      <div className="bg-blue-50 border-b border-blue-200 p-6">
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-lg mb-3">
-            <Sparkles className="w-6 h-6 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Your Dream Story
-          </h2>
-          <p className="text-gray-600">
-            Generated from:{" "}
-            <span className="font-semibold text-gray-900">
-              "{dreamData.title}"
-            </span>
-          </p>
-        </div>
+      <div className="bg-blue-50 border-b p-6 text-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Your Dream Story
+        </h2>
+        <p className="text-gray-600">
+          Generated from: <span className="font-medium">"{dreamData.title}"</span>
+        </p>
       </div>
 
       {/* Content */}
       <div className="p-6">
-        {/* Mobile Layout */}
-        <div className="block lg:hidden space-y-6">
-          {/* Image Section - Mobile */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Image Section */}
           {image && (
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <ImageIcon className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Dream Visualization
-                </h3>
-              </div>
-              <div className="relative rounded-lg overflow-hidden shadow-md border border-gray-200 bg-gray-100">
+              <h3 className="text-lg font-medium text-gray-900 mb-3">
+                Dream Visualization
+              </h3>
+              <div className="rounded-lg overflow-hidden border bg-gray-100">
                 <img
                   src={image}
                   alt="AI Dream Visualization"
-                  className={`w-full h-auto transition-opacity duration-300 ${
-                    imageLoaded ? "opacity-100" : "opacity-0"
-                  }`}
-                  onLoad={() => setImageLoaded(true)}
+                  className="w-full h-auto"
                 />
-                {!imageLoaded && (
-                  <div className="absolute inset-0 bg-gray-200 animate-pulse" />
-                )}
               </div>
             </div>
           )}
 
-          {/* Story Section - Mobile */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <BookOpen className="w-5 h-5 text-blue-600" />
-              <h3 className="text-lg font-semibold text-gray-900">
-                Dream Narrative
-              </h3>
-            </div>
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+          {/* Story Section */}
+          <div className={image ? "" : "lg:col-span-2"}>
+            <h3 className="text-lg font-medium text-gray-900 mb-3">
+              Dream Story
+            </h3>
+            <div className="bg-blue-50 rounded-lg p-4 border">
               <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
                 {story}
               </p>
@@ -183,160 +106,70 @@ const StoryDisplay: React.FC<StoryDisplayProps> = ({
           </div>
         </div>
 
-        {/* Desktop Layout */}
-        <div className="hidden lg:block">
-          <div className="flex gap-8 min-h-[400px]">
-            {/* Left Side - Image */}
-            {image && (
-              <div className="w-1/2">
-                <div className="flex items-center gap-2 mb-3">
-                  <ImageIcon className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Dream Visualization
-                  </h3>
-                </div>
-                <div className="relative rounded-lg overflow-hidden shadow-md border border-gray-200 bg-gray-100 h-full">
-                  <img
-                    src={image}
-                    alt="AI Dream Visualization"
-                    className={`w-full h-full object-cover transition-opacity duration-300 ${
-                      imageLoaded ? "opacity-100" : "opacity-0"
-                    }`}
-                    onLoad={() => setImageLoaded(true)}
-                  />
-                  {!imageLoaded && (
-                    <div className="absolute inset-0 bg-gray-200 animate-pulse" />
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Right Side - Story */}
-            <div className={`${image ? "w-1/2" : "w-full"}`}>
-              <div className="flex items-center gap-2 mb-3">
-                <BookOpen className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Dream Narrative
-                </h3>
-              </div>
-              <div className="bg-blue-50 rounded-lg p-6 border border-blue-200 h-full">
-                <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
-                  {story}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Privacy Toggle */}
-        <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">
+        {/* Privacy Settings */}
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+          <h3 className="text-sm font-medium text-gray-900 mb-3">
             Privacy Settings
           </h3>
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2">
               <input
                 type="radio"
                 name="privacy"
                 checked={!isPublic}
                 onChange={() => setIsPublic(false)}
-                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                className="text-blue-600"
               />
-              <Lock className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-700">
-                Private (only you can see)
-              </span>
+              <span className="text-sm text-gray-700">Private</span>
             </label>
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex items-center gap-2">
               <input
                 type="radio"
                 name="privacy"
                 checked={isPublic}
                 onChange={() => setIsPublic(true)}
-                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                className="text-blue-600"
               />
-              <Globe className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-700">
-                Public (visible to everyone)
-              </span>
+              <span className="text-sm text-gray-700">Public</span>
             </label>
           </div>
         </div>
 
-        {/* Success/Error Messages */}
+        {/* Messages */}
         {isSaved && (
-          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-start gap-3">
-              <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-semibold text-green-900 mb-1">
-                  Dream Saved Successfully!
-                </p>
-                <p className="text-sm text-green-700">
-                  Your dream has been saved to your collection and is now{" "}
-                  {isPublic ? "visible to everyone" : "private"}.
-                </p>
-              </div>
-            </div>
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded">
+            <p className="text-green-700 text-sm">
+              Dream saved successfully! It's now {isPublic ? "public" : "private"}.
+            </p>
           </div>
         )}
 
         {error && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-semibold text-red-900 mb-1">
-                  Error Saving Dream
-                </p>
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            </div>
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
+            <p className="text-red-700 text-sm">{error}</p>
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 mt-8">
+        <div className="flex gap-4 mt-6">
           <button
             onClick={handleSave}
             disabled={isSaving || isSaved}
-            className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded transition-colors"
           >
-            <span className="flex items-center justify-center gap-2">
-              {isSaving ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Saving Dream...
-                </>
-              ) : isSaved ? (
-                <>
-                  <CheckCircle2 className="w-5 h-5" />
-                  Saved Successfully!
-                </>
-              ) : (
-                <>
-                  <Save className="w-5 h-5" />
-                  Save Dream
-                </>
-              )}
-            </span>
+            {isSaving ? "Saving..." : isSaved ? "Saved!" : "Save Dream"}
           </button>
 
           <button
             onClick={handleNewDream}
-            className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
           >
-            <span className="flex items-center justify-center gap-2">
-              <Sparkles className="w-5 h-5" />
-              Create New Dream
-            </span>
+            Create New Dream
           </button>
         </div>
 
-        {/* Helper text */}
         <p className="text-center text-xs text-gray-500 mt-4">
-          Your dream will be{" "}
-          {isPublic ? "shared with the community" : "kept private"} after saving
+          Your dream will be {isPublic ? "shared with the community" : "kept private"}
         </p>
       </div>
     </div>

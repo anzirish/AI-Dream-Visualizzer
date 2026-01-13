@@ -1,19 +1,9 @@
 import mongoose from "mongoose";
 
-/**
- * Establishes connection to MongoDB database
- *
- * Connects to MongoDB using the connection string from environment variables.
- * Handles connection errors gracefully and provides detailed logging for debugging.
- * If connection fails, the server continues running without database functionality.
- *
- * @async
- * @function connectDB
- * @returns {Promise<void>} Promise that resolves when connection is established or fails
- */
+// Establishes connection to MongoDB database
 export const connectDB = async (): Promise<void> => {
   try {
-    /** MongoDB connection URI from environment variables */
+    // MongoDB connection URI from environment variables
     const mongoURI = process.env.MONGODB_URI;
 
     // Validate that MongoDB URI is provided
@@ -26,12 +16,8 @@ export const connectDB = async (): Promise<void> => {
     const conn = await mongoose.connect(mongoURI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
 
-    /**
-     * MongoDB Connection Event Handlers
-     *
-     * These event listeners handle various connection states and provide
-     * appropriate logging for monitoring and debugging purposes.
-     */
+    // MongoDB Connection Event Handlers
+    // These event listeners handle various connection states and provide appropriate logging
 
     // Handle connection errors after initial connection
     mongoose.connection.on("error", (err) => {
@@ -43,17 +29,12 @@ export const connectDB = async (): Promise<void> => {
       console.log("MongoDB disconnected");
     });
   } catch (error) {
-    /**
-     * Connection Error Handling
-     *
-     * If MongoDB connection fails, log the error but allow the server to continue
-     * running. This enables testing of non-database endpoints and provides
-     * better development experience when database is temporarily unavailable.
-     */
+    // Connection Error Handling
+    // If MongoDB connection fails, log the error but allow the server to continue running
     console.error("Error connecting to MongoDB:", error);
     console.log("Server will continue without database connection");
   }
 };
 
-/** Default export for backward compatibility */
+// Default export for backward compatibility
 export default connectDB;

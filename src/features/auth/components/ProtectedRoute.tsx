@@ -2,27 +2,12 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
-/**
- * ProtectedRoute Component
- *
- * Route wrapper component that ensures only authenticated users can access
- * protected pages. Redirects unauthenticated users to login page.
- *
- * Features:
- * - Authentication state checking
- * - Loading state display during auth verification
- * - Automatic redirect to login for unauthenticated users
- * - Seamless rendering of protected content for authenticated users
- * - Centered loading spinner with consistent styling
- */
-
 interface ProtectedRouteProps {
-  /** Child components to render when user is authenticated */
   children: React.ReactNode;
 }
 
+// Route wrapper that ensures only authenticated users can access protected pages
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  // Get authentication state from context
   const { user, loading } = useAuth();
 
   // Show loading spinner while authentication state is being determined

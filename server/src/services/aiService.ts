@@ -1,13 +1,6 @@
 // Removed ApiKey import - using environment variables only
 
-/**
- * OpenRouter API Response Interface
- *
- * Defines the expected structure of responses from OpenRouter.ai API
- * for chat completion requests.
- *
- * @interface OpenRouterResponse
- */
+// OpenRouter API Response Interface - Defines the expected structure of responses from OpenRouter.ai API
 interface OpenRouterResponse {
   choices: {
     message: {
@@ -16,27 +9,17 @@ interface OpenRouterResponse {
   }[];
 }
 
-/** OpenRouter.ai API endpoint for chat completions */
+// OpenRouter.ai API endpoint for chat completions
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-/** Default LLM model for story generation (free tier) */
+// Default LLM model for story generation (free tier)
 const MODEL = "mistralai/mistral-7b-instruct:free";
 
-/** Stability AI endpoint for image generation */
+// Stability AI endpoint for image generation
 const STABLE_DIFFUSION_URL =
   "https://api.stability.ai/v2beta/stable-image/generate/core";
 
-/**
- * Get API Key from Environment Variables
- *
- * Retrieves API keys from environment variables only.
- * No database lookup or user-submitted keys.
- *
- * @param keyType - Type of API key needed ('openrouter' or 'stable_diffusion')
- * @returns API key string from environment variables
- *
- * @throws {Error} When environment variable is not configured
- */
+// Get API Key from Environment Variables - Retrieves API keys from environment variables only
 const getApiKey = (keyType: "openrouter" | "stable_diffusion"): string => {
   const envKey =
     keyType === "openrouter"
@@ -52,19 +35,7 @@ const getApiKey = (keyType: "openrouter" | "stable_diffusion"): string => {
   return envKey;
 };
 
-/**
- * Generate AI Dream Story
- *
- * Creates an AI-generated story based on user's dream title and description.
- * Uses OpenRouter.ai API with Mistral model to generate interpretive narrative
- * that transforms the raw dream into an engaging, immersive story.
-
- * @param title - User's dream title
- * @param description - User's detailed dream description
- * @returns Promise resolving to generated story text
- *
- * @throws {Error} When no API keys are available or generation fails
- */
+// Generate AI Dream Story - Creates an AI-generated story based on user's dream title and description
 export const generateDreamStory = async (
   title: string,
   description: string
@@ -149,9 +120,7 @@ Important: Do not use markdown formatting, headers, or special characters. Write
   }
 };
 
-/**
- * Generate AI image from dream description
- */
+// Generate AI image from dream description
 export const generateDreamImage = async (
   description: string
 ): Promise<string> => {

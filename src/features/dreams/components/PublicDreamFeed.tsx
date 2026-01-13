@@ -4,57 +4,29 @@ import DreamCard from "./DreamCard";
 import { Search, Sparkles, Cloud, TrendingUp } from "lucide-react";
 import { dreamService } from "../services/dreamService";
 
-/**
- * PublicDreamFeed Component
- *
- * Displays a feed of public dreams with search functionality and various UI states.
- * Shows community-shared dreams in a responsive grid layout.
- *
- * Features:
- * - Fetches and displays public dreams from the backend
- * - Real-time search filtering by title and description
- * - Beautiful loading states with animated elements
- * - Empty states for no dreams and no search results
- * - Responsive grid layout with staggered animations
- * - Statistics display showing dream count
- * - Pagination indicator for large datasets
- * - Error handling with graceful fallbacks
- */
-
 interface PublicDreamFeedProps {
-  /** Optional search query to filter dreams */
-  searchQuery?: string;
+  searchQuery?: string; // Optional search query to filter dreams
 }
 
+// Displays a feed of public dreams with search functionality
 const PublicDreamFeed: React.FC<PublicDreamFeedProps> = ({
   searchQuery = "",
 }) => {
-  // Component state management
-  /** All public dreams fetched from backend */
   const [dreams, setDreams] = useState<Dream[]>([]);
-  
-  /** Loading state during initial data fetch */
   const [loading, setLoading] = useState(true);
-  
-  /** Dreams filtered by search query */
   const [filteredDreams, setFilteredDreams] = useState<Dream[]>([]);
 
   // Fetch public dreams when component mounts
   useEffect(() => {
-    /**
-     * Fetches public dreams from the backend service
-     * Handles errors gracefully and updates component state
-     */
+    // Fetches public dreams from the backend service
     const fetchPublicDreams = async () => {
       try {
-        // Fetch up to 50 most recent public dreams
         const result = await dreamService.getPublicDreams(1, 50);
         const dreamsData = result.dreams;
         setDreams(dreamsData);
         setFilteredDreams(dreamsData);
       } catch (error) {
         console.error("Error fetching public dreams:", error);
-        // Set empty arrays on error to show appropriate empty state
         setDreams([]);
         setFilteredDreams([]);
       } finally {
@@ -67,15 +39,10 @@ const PublicDreamFeed: React.FC<PublicDreamFeedProps> = ({
 
   // Filter dreams based on search query
   useEffect(() => {
-    /**
-     * Filters dreams by search query in title and description
-     * Case-insensitive search across both fields
-     */
+    // Filters dreams by search query in title and description
     if (searchQuery.trim() === "") {
-      // Show all dreams when no search query
       setFilteredDreams(dreams);
     } else {
-      // Filter dreams that match search query in title or description
       const filtered = dreams.filter(
         (dream) =>
           dream.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -149,7 +116,7 @@ const PublicDreamFeed: React.FC<PublicDreamFeedProps> = ({
         <div className="relative z-10 text-center max-w-lg mx-auto px-4">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-10 border border-gray-200 overflow-hidden">
             {searchQuery ? (
-              /* No Search Results State */
+              // No Search Results State
               <>
                 <div className="relative w-20 h-20 mx-auto mb-6">
                   <div className="absolute inset-0 bg-gray-200 rounded-full"></div>
@@ -170,7 +137,7 @@ const PublicDreamFeed: React.FC<PublicDreamFeedProps> = ({
                 </div>
               </>
             ) : (
-              /* No Dreams Available State */
+              // No Dreams Available State
               <>
                 <div className="relative w-24 h-24 mx-auto mb-6">
                   <div className="absolute inset-0 bg-blue-100 rounded-full animate-pulse"></div>

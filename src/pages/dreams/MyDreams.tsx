@@ -5,40 +5,17 @@ import { DreamCard } from "@/features/dreams";
 import { useAuth } from "@/features/auth";
 import { dreamService } from "@/features/dreams/services/dreamService";
 
-/**
- * MyDreams Page Component
- *
- * Personal dashboard page displaying all dreams created by the authenticated user.
- * Provides management capabilities for user's dream collection.
- *
- * Features:
- * - Grid layout of user's dreams using DreamCard components
- * - Delete functionality for dream management
- * - Empty state with call-to-action for new users
- * - Loading states during data fetching
- * - Error handling for API operations
- * - Responsive grid layout for different screen sizes
- * - Integration with dream service for CRUD operations
- */
+// Personal dashboard page displaying all dreams created by the authenticated user
 const MyDreams: React.FC = () => {
-  // Authentication and state management
   const { user } = useAuth();
-
-  /** Array of user's dreams */
   const [dreams, setDreams] = useState<Dream[]>([]);
-
-  /** Loading state during initial data fetch */
   const [loading, setLoading] = useState(true);
 
-  /**
-   * Fetches user's dreams from the backend
-   * Only executes if user is authenticated
-   */
+  // Fetches user's dreams from the backend
   const fetchDreams = useCallback(async () => {
     if (!user) return;
 
     try {
-      // Fetch dreams via dream service
       const dreamsData = await dreamService.getMyDreams();
       setDreams(dreamsData);
     } catch (error) {
@@ -53,17 +30,10 @@ const MyDreams: React.FC = () => {
     fetchDreams();
   }, [user, fetchDreams]);
 
-  /**
-   * Handles dream deletion with optimistic UI updates
-   *
-   * @param dreamId - ID of the dream to delete
-   */
+  // Handles dream deletion with optimistic UI updates
   const handleDelete = async (dreamId: string) => {
     try {
-      // Delete dream via service
       await dreamService.deleteDream(dreamId);
-
-      // Optimistically update UI by removing dream from state
       setDreams(dreams.filter((dream) => dream.id !== dreamId));
     } catch (error) {
       console.error("Error deleting dream:", error);
@@ -117,7 +87,7 @@ const MyDreams: React.FC = () => {
 
         {/* Conditional Content: Empty State vs Dreams Grid */}
         {dreams.length === 0 ? (
-          /* Empty State - No dreams created yet */
+          // Empty State - No dreams created yet
           <div className="text-center py-12">
             <div className="bg-white rounded-xl shadow-lg p-8 max-w-md mx-auto">
               {/* Empty state icon */}
@@ -149,7 +119,7 @@ const MyDreams: React.FC = () => {
             </div>
           </div>
         ) : (
-          /* Dreams Grid - Display user's dreams */
+          // Dreams Grid - Display user's dreams
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {dreams.map((dream) => (
               <DreamCard

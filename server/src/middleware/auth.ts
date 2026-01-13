@@ -3,42 +3,20 @@ import { verifyToken, extractTokenFromHeader, JWTPayload } from "../utils/jwt";
 import { ApiError } from "./errorHandler";
 import User from "../models/User";
 
-/**
- * Extended Request Interface
- *
- * Extends Express Request to include authenticated user information.
- * Used throughout the application to access current user data in route handlers.
- *
- * @interface AuthenticatedRequest
- * @extends {Request}
- */
+// Extended Request Interface - Extends Express Request to include authenticated user information
 export interface AuthenticatedRequest extends Request {
-  /** Authenticated user information (present when user is logged in) */
+  // Authenticated user information (present when user is logged in)
   user?: {
-    /** User's unique identifier */
+    // User's unique identifier
     userId: string;
-    /** User's email address */
+    // User's email address
     email: string;
-    /** User's display name (cached for performance) */
+    // User's display name (cached for performance)
     name?: string;
   };
 }
 
-/**
- * Required Authentication Middleware
- *
- * Verifies JWT token and attaches user data to request object.
- * Rejects requests without valid authentication tokens.
- *
- * This middleware should be used on protected routes that require
- * user authentication (e.g., creating dreams, accessing user data).
- *
- * @param req - Express request object (extended with user data)
- * @param res - Express response object
- * @param next - Express next function
- *
- * @throws {ApiError} 401 - When token is missing, invalid, or user doesn't exist
- */
+// Required Authentication Middleware - Verifies JWT token and attaches user data to request object
 export const authenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     // Extract JWT token from Authorization header (Bearer token format)
@@ -75,21 +53,7 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
   }
 };
 
-/**
- * Optional Authentication Middleware
- *
- * Attaches user data to request if valid token is present, but doesn't
- * require authentication. Useful for endpoints that provide different
- * functionality for authenticated vs anonymous users.
- *
- * This middleware should be used on public routes that can benefit from
- * user context when available (e.g., public dream feed with user preferences).
- *
- * @param req - Express request object (extended with optional user data)
- * @param res - Express response object
- * @param next - Express next function
-
- */
+// Optional Authentication Middleware - Attaches user data to request if valid token is present
 export const optionalAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     // Attempt to extract token from Authorization header

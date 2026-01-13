@@ -15,20 +15,18 @@ import { apiDocumentation } from "./src/config/apiDocs";
 // Load environment variables from .env file
 dotenv.config();
 
-/** Express application instance */
+// Express application instance
 const app = express();
 
-/** Server port from environment or default to 5000 */
+// Server port from environment or default to 5000
 const PORT = process.env.PORT || 5000;
 
 // Initialize database connection
 connectDB();
 
-/**
- * Security Middleware Configuration
- * - Helmet: Sets various HTTP headers for security
- * - CORS: Enables cross-origin requests from frontend
- */
+// Security Middleware Configuration
+// - Helmet: Sets various HTTP headers for security
+// - CORS: Enables cross-origin requests from frontend
 app.use(helmet());
 app.use(
   cors({
@@ -37,33 +35,22 @@ app.use(
   })
 );
 
-/**
- * Logging Middleware
- * Morgan logs HTTP requests in combined format for monitoring
- */
+// Logging Middleware
+// Morgan logs HTTP requests in combined format for monitoring
 app.use(morgan("combined"));
 
-/**
- * Rate Limiting Middleware
- * Prevents abuse by limiting requests per IP address
- */
+// Rate Limiting Middleware
+// Prevents abuse by limiting requests per IP address
 app.use(rateLimiter);
 
-/**
- * Body Parsing Middleware
- * - JSON parser with 10MB limit for image uploads
- * - URL-encoded parser for form data
- */
+// Body Parsing Middleware
+// - JSON parser with 10MB limit for image uploads
+// - URL-encoded parser for form data
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-/**
- * Health Check Endpoint
- * GET /health
- *
- * Provides server status information for monitoring and load balancers.
- * Returns server uptime, timestamp, and operational status.
- */
+// Health Check Endpoint - GET /health
+// Provides server status information for monitoring and load balancers
 app.get("/health", (req, res) => {
   res.status(200).json({
     status: "OK",
@@ -74,31 +61,20 @@ app.get("/health", (req, res) => {
   });
 });
 
-/**
- * API Route Configuration
- * - /api/v1: Main API endpoints (auth, dreams, AI generation, etc.)
- * - /api/analytics: Analytics and statistics endpoints
- */
+// API Route Configuration
+// - /api/v1: Main API endpoints (auth, dreams, AI generation, etc.)
+// - /api/analytics: Analytics and statistics endpoints
 app.use("/api/v1", v1Routes);
 app.use("/api/analytics", analyticsRoutes);
 
-/**
- * API Documentation Endpoint
- * GET /api
- *
- * Returns comprehensive API documentation including all available endpoints,
- * request/response formats, and usage examples.
- */
+// API Documentation Endpoint - GET /api
+// Returns comprehensive API documentation including all available endpoints
 app.get("/api", (req, res) => {
   res.status(200).json(apiDocumentation);
 });
 
-/**
- * 404 Not Found Handler
- *
- * Catches all unmatched routes and returns a helpful error message
- * with suggestions for finding the correct endpoint.
- */
+// 404 Not Found Handler
+// Catches all unmatched routes and returns a helpful error message
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -108,20 +84,12 @@ app.use((req, res) => {
   });
 });
 
-/**
- * Global Error Handler
- *
- * Centralized error handling middleware that processes all application errors
- * and returns appropriate HTTP responses with error details.
- */
+// Global Error Handler
+// Centralized error handling middleware that processes all application errors
 app.use(errorHandler);
 
-/**
- * Start the Express Server
- *
- * Binds the application to the specified port and begins listening for requests.
- * Logs startup information including available endpoints for easy development access.
- */
+// Start the Express Server
+// Binds the application to the specified port and begins listening for requests
 app.listen(PORT, () => {
   console.log(`🚀 AI Dreams API Server running on port ${PORT}`);
   console.log(`📊 Environment: development`);
@@ -131,5 +99,5 @@ app.listen(PORT, () => {
   console.log(`🏥 Health Check: http://localhost:${PORT}/health`);
 });
 
-/** Export for testing and external use */
+// Export for testing and external use
 export default app;

@@ -4,41 +4,25 @@ import { dreamService } from '@/features/dreams/services/dreamService';
 import { Calendar, User, Sparkles, ArrowLeft, Eye } from 'lucide-react';
 import type { Dream } from '@/features/dreams/types/dream';
 
-/**
- * DreamDetail Page Component
- *
- * Full-page view for displaying a single dream with all its details.
- * Accessible via direct URL and shows both public and private dreams.
- *
- * Features:
- * - Full dream display with image, metadata, and story
- * - Loading and error states with user-friendly messages
- * - Navigation controls (back button)
- * - Responsive layout for different screen sizes
- * - Image error handling with graceful fallbacks
- * - Rich typography and visual hierarchy
- * - Gradient backgrounds for enhanced visual appeal
- */
+// DreamDetail Page Component - Full-page view for displaying a single dream with all its details
 const DreamDetail: React.FC = () => {
   // URL parameters and navigation
   const { dreamId } = useParams<{ dreamId: string }>();
   const navigate = useNavigate();
   
   // Component state management
-  /** The dream data being displayed */
+  // The dream data being displayed
   const [dream, setDream] = useState<Dream | null>(null);
   
-  /** Loading state during data fetch */
+  // Loading state during data fetch
   const [loading, setLoading] = useState(true);
   
-  /** Error message if dream fetch fails */
+  // Error message if dream fetch fails
   const [error, setError] = useState<string | null>(null);
 
   // Fetch dream data when component mounts or dreamId changes
   useEffect(() => {
-    /**
-     * Fetches dream data from the backend using the dreamId from URL params
-     */
+    // Fetches dream data from the backend using the dreamId from URL params
     const fetchDream = async () => {
       if (!dreamId) {
         setError('Dream ID not provided');

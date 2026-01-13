@@ -1,30 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response, NextFunction } from "express";
 
-/**
- * Custom API Error Class
- *
- * Extends the native Error class to provide structured error handling
- * with HTTP status codes and operational error classification.
- *
- * @class ApiError
- * @extends {Error}
- */
+// Custom API Error Class - Extends the native Error class to provide structured error handling
 export class ApiError extends Error {
-  /** HTTP status code for the error response */
+  // HTTP status code for the error response
   public statusCode: number;
 
-  /** Whether this is an operational error (expected) vs programming error */
+  // Whether this is an operational error (expected) vs programming error
   public isOperational: boolean;
 
-  /**
-   * Creates a new API error with status code and message
-   *
-   * @param statusCode - HTTP status code (400, 401, 404, 500, etc.)
-   * @param message - Human-readable error message
-   * @param isOperational - Whether this is an expected operational error
-
-   */
+  // Creates a new API error with status code and message
   constructor(statusCode: number, message: string, isOperational = true) {
     super(message);
     this.statusCode = statusCode;
@@ -35,22 +20,7 @@ export class ApiError extends Error {
   }
 }
 
-/**
- * Global Error Handling Middleware
- *
- * Centralized error handler that catches all errors thrown in the application
- * and converts them to appropriate HTTP responses. Handles various error types
- * including database errors, validation errors, and JWT errors.
- *
- * This middleware should be registered last in the middleware chain to catch
- * all errors from previous middleware and route handlers.
- *
- * @param err - The error object thrown by the application
- * @param req - Express request object
- * @param res - Express response object
- * @param next - Express next function (unused but required for error middleware)
- *
- */
+// Global Error Handling Middleware - Centralized error handler that catches all errors thrown in the application
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction): void => {
   // Create a copy of the error to avoid mutation
@@ -60,12 +30,7 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
   // Log error details for debugging and monitoring
   console.error("Error:", err);
 
-  /**
-   * Error Type Handling
-   *
-   * Convert various error types to appropriate ApiError instances
-   * with user-friendly messages and correct HTTP status codes.
-   */
+  // Error Type Handling - Convert various error types to appropriate ApiError instances
 
   // Mongoose CastError - Invalid ObjectId format
   if (err.name === "CastError") {
@@ -99,12 +64,7 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
     error = new ApiError(401, message);
   }
 
-  /**
-   * Send Error Response
-   *
-   * Return standardized error response with appropriate status code.
-   * Include stack trace only in development for debugging.
-   */
+  // Send Error Response - Return standardized error response with appropriate status code
   res.status(error.statusCode || 500).json({
     success: false,
     message: error.message || "Server Error",

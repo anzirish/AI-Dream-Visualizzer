@@ -1,3 +1,1 @@
-export { Alert, AlertDescription } from './alert';
-export { Button } from './button';
-export { Input } from './input';
+// UI components index - currently empty after removing unused Button component

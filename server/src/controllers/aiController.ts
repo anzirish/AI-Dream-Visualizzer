@@ -4,29 +4,17 @@ import { ApiError } from "../middleware/errorHandler";
 import { AuthenticatedRequest } from "../middleware/auth";
 import Cover from "../models/Cover";
 
-/**
- * Get Random Fallback Cover Image
- *
- * Fetches a random cover image from the database to use when AI image generation fails.
- *
- * @returns Promise resolving to a random cover image URL, or null if no covers available
- */
+// Get random fallback cover image
 const getRandomFallbackCover = async (): Promise<string | null> => {
   try {
-    // Get count of covers
     const coverCount = await Cover.countDocuments();
-
     if (coverCount === 0) {
       console.warn("No covers found in database");
       return null;
     }
 
-    // Generate random index
     const randomIndex = Math.floor(Math.random() * coverCount);
-
-    // Get random cover using skip and load only one imag
     const randomCover = await Cover.findOne().skip(randomIndex);
-
     return randomCover?.url || null;
   } catch (error) {
     console.error("Error fetching random cover:", error);
@@ -34,21 +22,7 @@ const getRandomFallbackCover = async (): Promise<string | null> => {
   }
 };
 
-/**
- * Generate AI Story Handler
- *
- * Creates an AI-generated story based on user's dream title and description.
- * Uses community API keys and advanced language models for content generation.
- *
- * @route POST /api/v1/ai/generate-story
- * @access Private (requires authentication)
- *
- * @param req - Authenticated request with dream data
- * @param res - Express response object
- * @param next - Express next function for error handling
- *
- * @throws {ApiError} 400 - When title or description is missing
- */
+// Generate AI story handler
 export const generateStory = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -65,21 +39,14 @@ export const generateStory = async (
 
     res.status(200).json({
       success: true,
-      data: {
-        story,
-      },
+      data: { story },
     });
   } catch (error) {
     next(error);
   }
 };
 
-/**
- * Generate AI image from dream description
- * POST /api/v1/ai/generate-image
- *
- * If AI image generation fails, returns a random fallback cover from database.
- */
+// Generate AI image handler
 export const generateImage = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -93,37 +60,23 @@ export const generateImage = async (
     }
 
     try {
-      // Try AI image generation first
       const imageBase64 = await generateDreamImage(description);
-
       res.status(200).json({
         success: true,
-        data: {
-          image: imageBase64,
-        },
+        data: { image: imageBase64 },
       });
     } catch (aiError) {
-      console.error(
-        "AI image generation failed, using fallback cover:",
-        aiError
-      );
+      console.error("AI image generation failed, using fallback cover:", aiError);
 
-      // Try to get a random fallback cover from database
       const fallbackCover = await getRandomFallbackCover();
-
       if (fallbackCover) {
         res.status(200).json({
           success: true,
-          data: {
-            image: fallbackCover,
-          },
+          data: { image: fallbackCover },
           warning: "AI image generation failed, using fallback cover image",
         });
       } else {
-        throw new ApiError(
-          500,
-          "Image generation failed and no fallback covers available"
-        );
+        throw new ApiError(500, "Image generation failed and no fallback covers available");
       }
     }
   } catch (error) {
@@ -131,14 +84,7 @@ export const generateImage = async (
   }
 };
 
-/**
- * Generate complete dream with AI story and image
- * POST /api/v1/ai/generate-complete
- *
- * Always generates both story and image:
- * - Story generation is required and will fail the request if it fails
- * - Image generation tries AI first, falls back to random cover if AI fails
- */
+// Generate complete dream with AI story and image
 export const generateCompleteDream = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -151,13 +97,11 @@ export const generateCompleteDream = async (
       throw new ApiError(400, "Title and description are required");
     }
 
-    // Prepare promises for parallel execution
     const promises = [
-      generateDreamStory(title, description), // Always generate story
-      generateDreamImage(description), // Always try to generate image
+      generateDreamStory(title, description),
+      generateDreamImage(description),
     ];
 
-    // Use Promise.allSettled to handle partial failures gracefully
     const results = await Promise.allSettled(promises);
 
     // Extract story result (required)
@@ -173,17 +117,10 @@ export const generateCompleteDream = async (
     let warning = null;
 
     if (imageResult.status === "fulfilled") {
-      // AI image generation succeeded
       image = imageResult.value;
     } else {
-      // AI image generation failed, use fallback cover
-      console.error(
-        "AI image generation failed, using fallback cover:",
-        imageResult.reason
-      );
-
+      console.error("AI image generation failed, using fallback cover:", imageResult.reason);
       const fallbackCover = await getRandomFallbackCover();
-
       if (fallbackCover) {
         image = fallbackCover;
         warning = "AI image generation failed, using fallback cover image";
@@ -194,10 +131,7 @@ export const generateCompleteDream = async (
 
     res.status(200).json({
       success: true,
-      data: {
-        story,
-        image,
-      },
+      data: { story, image },
       ...(warning && { warning }),
     });
   } catch (error) {

@@ -4,14 +4,12 @@ import Dream from "../models/Dream";
 import User from "../models/User";
 import { ApiError } from "../middleware/errorHandler";
 
-/** Express router instance for analytics endpoints */
+// Express router instance for analytics endpoints
 const router = Router();
 
-/**
- * @route   GET /api/analytics/overview
- * @desc    Get platform overview statistics
- * @access  Public
- */
+// @route   GET /api/analytics/overview
+// @desc    Get platform overview statistics
+// @access  Public
 router.get("/overview", async (req, res, next) => {
   try {
     const [totalUsers, totalDreams, publicDreams] = await Promise.all([
@@ -37,11 +35,9 @@ router.get("/overview", async (req, res, next) => {
   }
 });
 
-/**
- * @route   GET /api/analytics/user/stats
- * @desc    Get current user's dream statistics
- * @access  Private
- */
+// @route   GET /api/analytics/user/stats
+// @desc    Get current user's dream statistics
+// @access  Private
 router.get("/user/stats", authenticate, async (req, res, next) => {
   try {
     const userId = (req as { user?: { userId: string } }).user?.userId;
@@ -99,11 +95,9 @@ router.get("/user/stats", authenticate, async (req, res, next) => {
   }
 });
 
-/**
- * @route   GET /api/analytics/trends
- * @desc    Get platform trends and popular content
- * @access  Public
- */
+// @route   GET /api/analytics/trends
+// @desc    Get platform trends and popular content
+// @access  Public
 router.get("/trends", async (req, res, next) => {
   try {
     // Get most active users (by public dream count)
@@ -161,11 +155,9 @@ router.get("/trends", async (req, res, next) => {
   }
 });
 
-/**
- * @route   GET /api/analytics/health
- * @desc    Analytics API health check
- * @access  Public
- */
+// @route   GET /api/analytics/health
+// @desc    Analytics API health check
+// @access  Public
 router.get("/health", (req, res) => {
   res.status(200).json({
     success: true,

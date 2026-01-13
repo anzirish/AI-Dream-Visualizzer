@@ -2,49 +2,28 @@ import React, { useState } from 'react';
 import { DreamForm, StoryDisplay } from '@/features/dreams';
 import type { DreamFormData } from '@/features/dreams';
 
-/**
- * CreateDream Page Component
- *
- * Main page for creating new dream stories using AI generation.
- * Provides a two-step workflow: dream input and story display/editing.
- *
- * Features:
- * - Two-phase UI: form input → story display
- * - AI-powered story and image generation
- * - Reset functionality to start over
- * - Instructional content for user guidance
- * - Responsive layout for all screen sizes
- * - Integration with DreamForm and StoryDisplay components
- */
+// CreateDream Page Component - Main page for creating new dream stories using AI generation
 const CreateDream: React.FC = () => {
   // State management for the dream creation workflow
-  /** AI-generated story content, null when not yet generated */
+  // AI-generated story content, null when not yet generated
   const [generatedStory, setGeneratedStory] = useState<string | null>(null);
   
-  /** AI-generated image URL */
+  // AI-generated image URL
   const [generatedImage, setGeneratedImage] = useState<string>('');
   
-  /** Original form data from user input */
+  // Original form data from user input
   const [dreamData, setDreamData] = useState<DreamFormData | null>(null);
 
-  /**
-   * Handles successful story generation from DreamForm
-   * Transitions from form view to story display view
-   * 
-   * @param story - AI-generated story content
-   * @param formData - Original user input data
-   * @param image - AI-generated image URL
-   */
+  // Handles successful story generation from DreamForm
+  // Transitions from form view to story display view
   const handleStoryGenerated = (story: string, formData: DreamFormData, image: string) => {
     setGeneratedStory(story);
     setGeneratedImage(image);
     setDreamData(formData);
   };
 
-  /**
-   * Resets the creation workflow back to the initial form state
-   * Allows users to start over with a new dream
-   */
+  // Resets the creation workflow back to the initial form state
+  // Allows users to start over with a new dream
   const handleReset = () => {
     setGeneratedStory(null);
     setGeneratedImage('');
